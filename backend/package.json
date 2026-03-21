@@ -9,17 +9,24 @@
     "start": "node dist/app.js",
     "lint": "eslint . --ext .ts"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.16.0",
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/client": "^6.19.2",
+    "express": "^5.2.1",
+    "ioredis": "^5.10.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/ioredis": "^5.0.0",
     "@types/node": "^20.19.37",
     "nodemon": "^3.1.14",
+    "prisma": "^6.19.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

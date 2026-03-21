@@ -1,0 +1,556 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- AUTH & USERS ---
+model User {
+  id               String               @id @default(uuid())
+  email            String               @unique
+  passwordHash     String?              @map("password_hash")
+  name             String
+  avatarUrl        String?              @map("avatar_url")
+  role             Role                 @default(USER)
+  level            String               @default("Beginner")
+  xp               Int                  @default(0)
+  streak           Int                  @default(0)
+  lives            Int                  @default(5)
+  isPremium        Boolean              @default(false) @map("is_premium")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  oauthAccounts    OAuthAccount[]
+  refreshTokens    RefreshToken[]
+  placementTests   PlacementTest[]
+  courseEnrollments UserCourseEnrollment[]
+  lessonProgress   UserLessonProgress[]
+  exerciseAnswers  UserExerciseAnswer[]
+  vocabSets        VocabSet[]
+  vocabProgress    UserVocabProgress[]
+  badges           UserBadge[]
+  leaderboardEntries LeaderboardEntry[]
+  inventory        UserInventory[]
+  streakRecords    StreakRecord[]
+  examAttempts     UserExamAttempt[]
+  chatSessions     AIChatSession[]
+  writingSubmissions AIWritingSubmission[]
+  pronunciationRecords PronunciationRecord[]
+  forumPosts       ForumPost[]
+  forumComments    ForumComment[]
+  forumLikes       ForumLike[]
+  languageExchange LanguageExchange?
+  challengeParticipants ChallengeParticipant[]
+  subscriptions    UserSubscription[]
+  transactions     PaymentTransaction[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model OAuthAccount {
+  id           String @id @default(uuid())
+  userId       String @map("user_id")
+  provider     String
+  providerId   String @map("provider_id")
+  accessToken  String? @map("access_token")
+  user         User   @relation(fields: [userId], references: [id])
+
+  @@map("oauth_accounts")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("refresh_tokens")
+}
+
+model PlacementTest {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  score        Int
+  levelResult  String   @map("level_result")
+  completedAt  DateTime @default(now()) @map("completed_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("placement_tests")
+}
+
+// --- COURSES & LEARNING PATH ---
+model Course {
+  id              String               @id @default(uuid())
+  title           String
+  description     String?
+  level           String
+  category        String
+  thumbnail       String?
+  isFree          Boolean              @default(true) @map("is_free")
+  orderIndex      Int                  @map("order_index")
+  units           Unit[]
+  enrollments     UserCourseEnrollment[]
+
+  @@map("courses")
+}
+
+model Unit {
+  id          String   @id @default(uuid())
+  courseId    String   @map("course_id")
+  title       String
+  description String?
+  orderIndex  Int      @map("order_index")
+  course      Course   @relation(fields: [courseId], references: [id])
+  lessons     Lesson[]
+
+  @@map("units")
+}
+
+model Lesson {
+  id              String               @id @default(uuid())
+  unitId          String               @map("unit_id")
+  title           String
+  type            String
+  contentJson     Json                 @map("content_json")
+  durationMinutes Int                  @map("duration_minutes")
+  xpReward        Int                  @default(0) @map("xp_reward")
+  orderIndex      Int                  @map("order_index")
+  unit            Unit                 @relation(fields: [unitId], references: [id])
+  exercises       Exercise[]
+  userProgress    UserLessonProgress[]
+
+  @@map("lessons")
+}
+
+model Exercise {
+  id            String               @id @default(uuid())
+  lessonId      String               @map("lesson_id")
+  type          String
+  question      String
+  optionsJson   Json?                @map("options_json")
+  correctAnswer String               @map("correct_answer")
+  explanation   String?
+  orderIndex    Int                  @map("order_index")
+  lesson        Lesson               @relation(fields: [lessonId], references: [id])
+  userAnswers   UserExerciseAnswer[]
+
+  @@map("exercises")
+}
+
+model UserCourseEnrollment {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  courseId        String   @map("course_id")
+  enrolledAt      DateTime @default(now()) @map("enrolled_at")
+  progressPercent Float    @default(0) @map("progress_percent")
+  user            User     @relation(fields: [userId], references: [id])
+  course          Course   @relation(fields: [courseId], references: [id])
+
+  @@map("user_course_enrollments")
+}
+
+model UserLessonProgress {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  lessonId    String   @map("lesson_id")
+  status      String   // COMPLETED, IN_PROGRESS
+  score       Int?
+  attempts    Int      @default(0)
+  completedAt DateTime? @map("completed_at")
+  user        User     @relation(fields: [userId], references: [id])
+  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+
+  @@map("user_lesson_progress")
+}
+
+model UserExerciseAnswer {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  exerciseId  String   @map("exercise_id")
+  answer      String
+  isCorrect   Boolean  @map("is_correct")
+  answeredAt  DateTime @default(now()) @map("answered_at")
+  user        User     @relation(fields: [userId], references: [id])
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@map("user_exercise_answers")
+}
+
+// --- VOCABULARY ---
+model VocabWord {
+  id           String               @id @default(uuid())
+  word         String
+  phonetic     String?
+  definition   String
+  examplesJson Json?                @map("examples_json")
+  audioUrl     String?              @map("audio_url")
+  imageUrl     String?              @map("image_url")
+  level        String
+  topic        String
+  setWords     VocabSetWord[]
+  userProgress UserVocabProgress[]
+
+  @@map("vocab_words")
+}
+
+model VocabSet {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  title       String
+  description String?
+  isPublic    Boolean        @default(false) @map("is_public")
+  user        User           @relation(fields: [userId], references: [id])
+  setWords    VocabSetWord[]
+
+  @@map("vocab_sets")
+}
+
+model VocabSetWord {
+  id         String    @id @default(uuid())
+  setId      String    @map("set_id")
+  wordId     String    @map("word_id")
+  orderIndex Int       @map("order_index")
+  set        VocabSet  @relation(fields: [setId], references: [id])
+  word       VocabWord @relation(fields: [wordId], references: [id])
+
+  @@map("vocab_set_words")
+}
+
+model UserVocabProgress {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  wordId      String    @map("word_id")
+  easeFactor  Float     @default(2.5) @map("ease_factor")
+  interval    Int       @default(0)
+  nextReview  DateTime  @default(now()) @map("next_review")
+  repetitions Int       @default(0)
+  user        User      @relation(fields: [userId], references: [id])
+  word        VocabWord @relation(fields: [wordId], references: [id])
+
+  @@map("user_vocab_progress")
+}
+
+// --- GAMIFICATION ---
+model Badge {
+  id             String      @id @default(uuid())
+  name           String
+  description    String?
+  iconUrl        String?     @map("icon_url")
+  conditionType  String      @map("condition_type")
+  conditionValue Int         @map("condition_value")
+  userBadges     UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  badgeId  String   @map("badge_id")
+  earnedAt DateTime @default(now()) @map("earned_at")
+  user     User     @relation(fields: [userId], references: [id])
+  badge    Badge    @relation(fields: [badgeId], references: [id])
+
+  @@map("user_badges")
+}
+
+model LeaderboardEntry {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  periodType   String   @map("period_type") // WEEKLY, MONTHLY
+  xpEarned     Int      @map("xp_earned")
+  rank         Int?
+  periodStart  DateTime @map("period_start")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("leaderboard_entries")
+}
+
+model ShopItem {
+  id          String          @id @default(uuid())
+  name        String
+  type        String
+  description String?
+  iconUrl     String?         @map("icon_url")
+  priceXp     Int?            @map("price_xp")
+  priceCoins  Int?            @map("price_coins")
+  inventory   UserInventory[]
+
+  @@map("shop_items")
+}
+
+model UserInventory {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  itemId      String   @map("item_id")
+  purchasedAt DateTime @default(now()) @map("purchased_at")
+  isActive    Boolean  @default(false) @map("is_active")
+  user        User     @relation(fields: [userId], references: [id])
+  item        ShopItem @relation(fields: [itemId], references: [id])
+
+  @@map("user_inventory")
+}
+
+model StreakRecord {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  currentStreak     Int      @default(0) @map("current_streak")
+  longestStreak     Int      @default(0) @map("longest_streak")
+  lastActivityDate  DateTime @default(now()) @map("last_activity_date")
+  user              User     @relation(fields: [userId], references: [id])
+
+  @@map("streak_records")
+}
+
+// --- EXAMS ---
+model ExamSet {
+  id              String             @id @default(uuid())
+  title           String
+  type            String             // IELTS, TOEIC, TOEFL
+  level           String
+  durationMinutes Int                @map("duration_minutes")
+  isPremium       Boolean            @default(false) @map("is_premium")
+  questions       ExamQuestion[]
+  attempts        UserExamAttempt[]
+
+  @@map("exam_sets")
+}
+
+model ExamQuestion {
+  id           String           @id @default(uuid())
+  examSetId    String           @map("exam_set_id")
+  skill        String           // LISTENING, READING, WRITING, SPEAKING
+  questionText String?          @map("question_text")
+  audioUrl     String?          @map("audio_url")
+  optionsJson  Json?            @map("options_json")
+  correctAnswer String?          @map("correct_answer")
+  orderIndex   Int              @map("order_index")
+  examSet      ExamSet          @relation(fields: [examSetId], references: [id])
+  userAnswers  UserExamAnswer[]
+
+  @@map("exam_questions")
+}
+
+model UserExamAttempt {
+  id          String           @id @default(uuid())
+  userId      String           @map("user_id")
+  examSetId   String           @map("exam_set_id")
+  startedAt   DateTime         @default(now()) @map("started_at")
+  submittedAt DateTime?        @map("submitted_at")
+  scoreJson   Json?            @map("score_json")
+  totalScore  Float?           @map("total_score")
+  user        User             @relation(fields: [userId], references: [id])
+  examSet     ExamSet          @relation(fields: [examSetId], references: [id])
+  userAnswers UserExamAnswer[]
+
+  @@map("user_exam_attempts")
+}
+
+model UserExamAnswer {
+  id           String          @id @default(uuid())
+  attemptId    String          @map("attempt_id")
+  questionId   String          @map("question_id")
+  userAnswer   String?         @map("user_answer")
+  isCorrect    Boolean?        @map("is_correct")
+  timeSpent    Int?            @map("time_spent")
+  attempt      UserExamAttempt @relation(fields: [attemptId], references: [id])
+  question     ExamQuestion    @relation(fields: [questionId], references: [id])
+
+  @@map("user_exam_answers")
+}
+
+// --- AI ---
+model AIChatSession {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  scenario     String
+  messagesJson Json     @map("messages_json")
+  createdAt    DateTime @default(now()) @map("created_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("ai_chat_sessions")
+}
+
+model AIWritingSubmission {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  prompt       String
+  content      String
+  feedbackJson Json?    @map("feedback_json")
+  score        Float?
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("ai_writing_submissions")
+}
+
+model PronunciationRecord {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  wordOrSentence String   @map("word_or_sentence")
+  audioUrl       String?  @map("audio_url")
+  score          Float?
+  feedbackJson   Json?    @map("feedback_json")
+  recordedAt     DateTime @default(now()) @map("recorded_at")
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("pronunciation_records")
+}
+
+// --- COMMUNITY ---
+model ForumCategory {
+  id          String      @id @default(uuid())
+  name        String
+  slug        String      @unique
+  description String?
+  icon        String?
+  posts       ForumPost[]
+
+  @@map("forum_categories")
+}
+
+model ForumPost {
+  id          String         @id @default(uuid())
+  userId      String         @map("user_id")
+  categoryId  String         @map("category_id")
+  title       String
+  content     String
+  views       Int            @default(0)
+  isPinned    Boolean        @default(false) @map("is_pinned")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  user        User           @relation(fields: [userId], references: [id])
+  category    ForumCategory  @relation(fields: [categoryId], references: [id])
+  comments    ForumComment[]
+  likes       ForumLike[]
+
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String      @id @default(uuid())
+  postId    String      @map("post_id")
+  userId    String      @map("user_id")
+  content   String
+  parentId  String?     @map("parent_id")
+  createdAt DateTime    @default(now()) @map("created_at")
+  post      ForumPost   @relation(fields: [postId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+  parent    ForumComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   ForumComment[] @relation("CommentReplies")
+  likes     ForumLike[]
+
+  @@map("forum_comments")
+}
+
+model ForumLike {
+  id        String        @id @default(uuid())
+  userId    String        @map("user_id")
+  postId    String?       @map("post_id")
+  commentId String?       @map("comment_id")
+  createdAt DateTime      @default(now()) @map("created_at")
+  user      User          @relation(fields: [userId], references: [id])
+  post      ForumPost?    @relation(fields: [postId], references: [id])
+  comment   ForumComment? @relation(fields: [commentId], references: [id])
+
+  @@map("forum_likes")
+}
+
+model LanguageExchange {
+  id          String  @id @default(uuid())
+  userId      String  @unique @map("user_id")
+  nativeLang  String  @map("native_lang")
+  targetLang  String  @map("target_lang")
+  bio         String?
+  isAvailable Boolean @default(true) @map("is_available")
+  user        User    @relation(fields: [userId], references: [id])
+
+  @@map("language_exchange")
+}
+
+model Challenge {
+  id           String                 @id @default(uuid())
+  title        String
+  description  String?
+  type         String
+  startDate    DateTime               @map("start_date")
+  endDate      DateTime               @map("end_date")
+  rewardXp     Int                    @map("reward_xp")
+  participants ChallengeParticipant[]
+
+  @@map("challenges")
+}
+
+model ChallengeParticipant {
+  id          String    @id @default(uuid())
+  challengeId String    @map("challenge_id")
+  userId      String    @map("user_id")
+  progress    Float     @default(0)
+  completedAt DateTime? @map("completed_at")
+  challenge   Challenge @relation(fields: [challengeId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("challenge_participants")
+}
+
+// --- PAYMENTS ---
+model SubscriptionPlan {
+  id           String             @id @default(uuid())
+  name         String
+  price        Float
+  durationDays Int                @map("duration_days")
+  featuresJson Json               @map("features_json")
+  subscriptions UserSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model UserSubscription {
+  id            String           @id @default(uuid())
+  userId        String           @map("user_id")
+  planId        String           @map("plan_id")
+  startedAt     DateTime         @default(now()) @map("started_at")
+  expiresAt     DateTime         @map("expires_at")
+  paymentMethod String?          @map("payment_method")
+  status        String           // ACTIVE, EXPIRED, CANCELLED
+  user          User             @relation(fields: [userId], references: [id])
+  plan          SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@map("user_subscriptions")
+}
+
+model PaymentTransaction {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  planId        String?  @map("plan_id")
+  amount        Float
+  currency      String   @default("VND")
+  gateway       String   // MOMO, VNPAY, STRIPE
+  transactionId String   @unique @map("transaction_id")
+  status        String
+  createdAt     DateTime @default(now()) @map("created_at")
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("payment_transactions")
+}
+
+// --- NOTIFICATIONS ---
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
