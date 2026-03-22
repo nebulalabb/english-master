@@ -1,34 +1,36 @@
-FROM node:22-alpine AS base
+FROM node:22 AS base
 
 # Install pnpm
 RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy dependency files
-COPY package.json pnpm-lock.yaml ./
-# If using workspaces, we might need more files, but for a single service Dockerfile:
-# COPY pnpm-workspace.yaml ./ 
+# Copy all workspace manifests
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY backend/package.json ./backend/
+COPY frontend/package.json ./frontend/
 
-# Install dependencies
+# Install dependencies for the whole workspace
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY . .
+# Copy backend source code
+COPY backend ./backend
 
 # Generate Prisma Client
-RUN npx prisma generate
+RUN cd backend && npx prisma generate
 
-# Build application
-RUN pnpm run build
+# Build backend
+RUN cd backend && pnpm run build
 
 # Production image
-FROM node:22-alpine AS runner
+FROM node:22-slim AS runner
 WORKDIR /app
-COPY --from=base /app/dist ./dist
+RUN npm install -g pnpm
+
+COPY --from=base /app/backend/dist ./dist
 COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/package.json ./package.json
-COPY --from=base /app/prisma ./prisma
+COPY --from=base /app/backend/package.json ./package.json
+COPY --from=base /app/backend/prisma ./prisma
 
 EXPOSE 4001
 

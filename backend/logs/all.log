@@ -1,1 +1,39 @@
 2026-03-21 21:39:59:3959 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 13:56:56:5656 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 13:59:12:5912 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:03:15:315 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:17:15:1715 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:17:45:1745 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:20:30:2030 [31merror[39m: [31m500 - [39m
+[31mInvalid `prisma.user.findUnique()` invocation in[39m
+[31mD:\xampp\htdocs\my-project\english-master\backend\src\modules\auth\auth.service.ts:26:44[39m
+
+[31m  23 static async register(userData: any) {[39m
+[31m  24   const { email, password, name } = userData;[39m
+[31m  25 [39m
+[31m→ 26   const existingUser = await prisma.user.findUnique([39m
+[31mAuthentication failed against database server, the provided database credentials for `user` are not valid.[39m
+
+[31mPlease make sure to provide valid database credentials for the database server at the configured address. - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:20:30:2030 [35mhttp[39m: [35m::1 - - [22/Mar/2026:07:20:30 +0000] "POST /api/v1/auth/register HTTP/1.1" 500 564 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"[39m
+2026-03-22 14:20:46:2046 [31merror[39m: [31m500 - [39m
+[31mInvalid `prisma.user.findUnique()` invocation in[39m
+[31mD:\xampp\htdocs\my-project\english-master\backend\src\modules\auth\auth.service.ts:26:44[39m
+
+[31m  23 static async register(userData: any) {[39m
+[31m  24   const { email, password, name } = userData;[39m
+[31m  25 [39m
+[31m→ 26   const existingUser = await prisma.user.findUnique([39m
+[31mAuthentication failed against database server, the provided database credentials for `user` are not valid.[39m
+
+[31mPlease make sure to provide valid database credentials for the database server at the configured address. - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:20:46:2046 [35mhttp[39m: [35m::1 - - [22/Mar/2026:07:20:46 +0000] "POST /api/v1/auth/register HTTP/1.1" 500 564 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"[39m
+2026-03-22 14:21:32:2132 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:21:32:2132 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:21:46:2146 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:21:46:2146 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:21:58:2158 [31merror[39m: [31m500 - Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2b08366c56bsm98142115ad.57 - gsmtp - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:21:58:2158 [35mhttp[39m: [35m::1 - - [22/Mar/2026:07:21:58 +0000] "POST /api/v1/auth/register HTTP/1.1" 500 230 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"[39m
+2026-03-22 14:22:52:2252 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m
+2026-03-22 14:22:52:2252 [32minfo[39m: [32mBackend listening at http://localhost:4001[39m

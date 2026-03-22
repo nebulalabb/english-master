@@ -1,0 +1,25 @@
+2026-03-22 14:20:30:2030 [31merror[39m: [31m500 - [39m
+[31mInvalid `prisma.user.findUnique()` invocation in[39m
+[31mD:\xampp\htdocs\my-project\english-master\backend\src\modules\auth\auth.service.ts:26:44[39m
+
+[31m  23 static async register(userData: any) {[39m
+[31m  24   const { email, password, name } = userData;[39m
+[31m  25 [39m
+[31m→ 26   const existingUser = await prisma.user.findUnique([39m
+[31mAuthentication failed against database server, the provided database credentials for `user` are not valid.[39m
+
+[31mPlease make sure to provide valid database credentials for the database server at the configured address. - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:20:46:2046 [31merror[39m: [31m500 - [39m
+[31mInvalid `prisma.user.findUnique()` invocation in[39m
+[31mD:\xampp\htdocs\my-project\english-master\backend\src\modules\auth\auth.service.ts:26:44[39m
+
+[31m  23 static async register(userData: any) {[39m
+[31m  24   const { email, password, name } = userData;[39m
+[31m  25 [39m
+[31m→ 26   const existingUser = await prisma.user.findUnique([39m
+[31mAuthentication failed against database server, the provided database credentials for `user` are not valid.[39m
+
+[31mPlease make sure to provide valid database credentials for the database server at the configured address. - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:21:58:2158 [31merror[39m: [31m500 - Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to[39m
+[31m535 5.7.8  https://support.google.com/mail/?p=BadCredentials d9443c01a7336-2b08366c56bsm98142115ad.57 - gsmtp - /api/v1/auth/register - POST - ::1[39m
+2026-03-22 14:32:59:3259 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m

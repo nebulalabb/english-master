@@ -22,7 +22,9 @@ services:
       - redis_data:/data
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     restart: always
     ports:
       - "4001:4001"
@@ -35,7 +37,9 @@ services:
       - redis
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     restart: always
     ports:
       - "3000:3000"

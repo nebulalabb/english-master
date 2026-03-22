@@ -20,6 +20,7 @@ model User {
   streak           Int                  @default(0)
   lives            Int                  @default(5)
   isPremium        Boolean              @default(false) @map("is_premium")
+  learningGoals    String?              @map("learning_goals")
   createdAt        DateTime             @default(now()) @map("created_at")
   oauthAccounts    OAuthAccount[]
   refreshTokens    RefreshToken[]

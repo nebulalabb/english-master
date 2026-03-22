@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import QueryProvider from '@/providers/QueryProvider';
 import { Toaster } from 'react-hot-toast';
+import AuthGuard from '@/components/auth/AuthGuard';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,7 +28,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <AuthGuard>
+              {children}
+            </AuthGuard>
             <Toaster position="top-right" />
           </ThemeProvider>
         </QueryProvider>
