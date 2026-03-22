@@ -46,6 +46,13 @@ model User {
   subscriptions    UserSubscription[]
   transactions     PaymentTransaction[]
   notifications    Notification[]
+  grammarProgress  UserGrammarProgress[]
+  grammarAnswers   UserGrammarAnswer[]
+  listeningProgress UserListeningProgress[]
+  listeningAnswers  UserListeningAnswer[]
+  speakingExercises SpeakingExercise[]
+  writingPrompts    WritingPrompt[]
+  readingProgress   UserReadingProgress[]
 
   @@map("users")
 }
@@ -152,6 +159,7 @@ model UserCourseEnrollment {
   courseId        String   @map("course_id")
   enrolledAt      DateTime @default(now()) @map("enrolled_at")
   progressPercent Float    @default(0) @map("progress_percent")
+  lastStudiedAt   DateTime @default(now()) @map("last_studied_at")
   user            User     @relation(fields: [userId], references: [id])
   course          Course   @relation(fields: [courseId], references: [id])
 
@@ -236,7 +244,161 @@ model UserVocabProgress {
   user        User      @relation(fields: [userId], references: [id])
   word        VocabWord @relation(fields: [wordId], references: [id])
 
+  @@unique([userId, wordId])
   @@map("user_vocab_progress")
+}
+
+// --- GRAMMAR ---
+model GrammarTopic {
+  id           String            @id @default(uuid())
+  title        String
+  description  String?
+  level        String
+  contentJson  Json              @map("content_json") // Structured lesson content
+  orderIndex   Int               @map("order_index")
+  exercises    GrammarExercise[]
+  userProgress UserGrammarProgress[]
+
+  @@map("grammar_topics")
+}
+
+model GrammarExercise {
+  id            String               @id @default(uuid())
+  topicId       String               @map("topic_id")
+  type          String               // MULTIPLE_CHOICE, FILL_IN_BLANK, REORDER, ERROR_CORRECTION, TRANSFORMATION
+  question      String
+  optionsJson   Json?                @map("options_json")
+  correctAnswer String               @map("correct_answer")
+  explanation   String?
+  orderIndex    Int                  @map("order_index")
+  topic         GrammarTopic         @relation(fields: [topicId], references: [id])
+  userAnswers   UserGrammarAnswer[]
+
+  @@map("grammar_exercises")
+}
+
+model UserGrammarProgress {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  topicId     String       @map("topic_id")
+  status      String       // NOT_STARTED, IN_PROGRESS, COMPLETED
+  lastStudied DateTime     @default(now()) @map("last_studied")
+  user        User         @relation(fields: [userId], references: [id])
+  topic       GrammarTopic @relation(fields: [topicId], references: [id])
+
+  @@unique([userId, topicId])
+  @@map("user_grammar_progress")
+}
+
+model UserGrammarAnswer {
+  id          String          @id @default(uuid())
+  userId      String          @map("user_id")
+  exerciseId  String          @map("exercise_id")
+  answer      String
+  isCorrect   Boolean         @map("is_correct")
+  answeredAt  DateTime        @default(now()) @map("answered_at")
+  user        User            @relation(fields: [userId], references: [id])
+  exercise    GrammarExercise @relation(fields: [exerciseId], references: [id])
+
+  @@map("user_grammar_answers")
+}
+
+// --- LISTENING ---
+model ListeningExercise {
+  id           String            @id @default(uuid())
+  title        String
+  description  String?
+  level        String
+  topic        String
+  audioUrl     String            @map("audio_url")
+  transcript   String?           // Full transcript
+  durationSec  Int               @map("duration_sec")
+  thumbnail    String?
+  orderIndex   Int               @map("order_index")
+  questions    ListeningQuestion[]
+  userProgress UserListeningProgress[]
+
+  @@map("listening_exercises")
+}
+
+model ListeningQuestion {
+  id            String            @id @default(uuid())
+  exerciseId    String            @map("exercise_id")
+  type          String            // MULTIPLE_CHOICE, FILL_IN_BLANK, TRUE_FALSE, MATCHING, NOTE_COMPLETION
+  questionText  String            @map("question_text")
+  optionsJson   Json?             @map("options_json")
+  correctAnswer String            @map("correct_answer")
+  explanation   String?
+  orderIndex    Int               @map("order_index")
+  exercise      ListeningExercise @relation(fields: [exerciseId], references: [id])
+  userAnswers   UserListeningAnswer[]
+
+  @@map("listening_questions")
+}
+
+model UserListeningProgress {
+  id          String            @id @default(uuid())
+  userId      String            @map("user_id")
+  exerciseId  String            @map("exercise_id")
+  status      String            // NOT_STARTED, IN_PROGRESS, COMPLETED
+  score       Float?
+  lastStudied DateTime          @default(now()) @map("last_studied")
+  user        User              @relation(fields: [userId], references: [id])
+  exercise    ListeningExercise @relation(fields: [exerciseId], references: [id])
+
+  @@unique([userId, exerciseId])
+  @@map("user_listening_progress")
+}
+
+model UserListeningAnswer {
+  id          String            @id @default(uuid())
+  userId      String            @map("user_id")
+  questionId  String            @map("question_id")
+  answer      String
+  isCorrect   Boolean           @map("is_correct")
+  answeredAt  DateTime          @default(now()) @map("answered_at")
+  user        User              @relation(fields: [userId], references: [id])
+  question    ListeningQuestion @relation(fields: [questionId], references: [id])
+
+  @@map("user_listening_answers")
+}
+
+// --- SPEAKING ---
+model SpeakingExercise {
+  id           String            @id @default(uuid())
+  title        String
+  description  String?
+  level        String
+  type         String            // PRONUNCIATION, READ_ALOUD, DESCRIBE_IMAGE, QUESTION_ANSWER
+  targetText   String            @map("target_text")
+  phonetic     String?
+  audioUrl     String?           @map("audio_url") // Sample natural audio
+  imageUrl     String?           @map("image_url") // For Describe Image
+  orderIndex   Int               @map("order_index")
+  creatorId    String?           @map("creator_id")
+  creator      User?             @relation(fields: [creatorId], references: [id])
+  userRecords  PronunciationRecord[]
+
+  @@map("speaking_exercises")
+}
+
+model WritingPrompt {
+  id           String            @id @default(uuid())
+  title        String
+  description  String?           // General context
+  requirements String?           // Specific rules (e.g. min 250 words)
+  type         String            // EMAIL, ESSAY, IELTS_TASK_1, IELTS_TASK_2, PARAGRAPH
+  level        String
+  topic        String
+  tipsJson     Json?             @map("tips_json") // Detailed guidance
+  exampleText  String?           @map("example_text") // Model answer
+  targetWords  Int               @default(150) @map("target_words")
+  orderIndex   Int               @map("order_index")
+  creatorId    String?           @map("creator_id")
+  creator      User?             @relation(fields: [creatorId], references: [id])
+  submissions  AIWritingSubmission[]
+
+  @@map("writing_prompts")
 }
 
 // --- GAMIFICATION ---
@@ -383,12 +545,14 @@ model AIChatSession {
 model AIWritingSubmission {
   id           String   @id @default(uuid())
   userId       String   @map("user_id")
-  prompt       String
+  promptId     String?  @map("prompt_id")
+  prompt       String?  // Original prompt text if not linked to structured prompt
   content      String
-  feedbackJson Json?    @map("feedback_json")
+  feedbackJson Json?    @map("feedback_json") // { overallScore, grammar, vocab, coherence, task, highlightedErrors: [], suggestions: [] }
   score        Float?
   submittedAt  DateTime @default(now()) @map("submitted_at")
   user         User     @relation(fields: [userId], references: [id])
+  writingPrompt WritingPrompt? @relation(fields: [promptId], references: [id])
 
   @@map("ai_writing_submissions")
 }
@@ -401,7 +565,9 @@ model PronunciationRecord {
   score          Float?
   feedbackJson   Json?    @map("feedback_json")
   recordedAt     DateTime @default(now()) @map("recorded_at")
+  exerciseId     String?  @map("exercise_id")
   user           User     @relation(fields: [userId], references: [id])
+  exercise       SpeakingExercise? @relation(fields: [exerciseId], references: [id])
 
   @@map("pronunciation_records")
 }
@@ -540,6 +706,62 @@ model PaymentTransaction {
   user          User     @relation(fields: [userId], references: [id])
 
   @@map("payment_transactions")
+}
+
+// --- READING ---
+model ReadingPassage {
+  id           String             @id @default(uuid())
+  title        String
+  content      String             @db.Text
+  level        String
+  topic        String
+  durationMins Int?               @map("duration_mins")
+  imageUrl     String?            @map("image_url")
+  questions    ReadingQuestion[]
+  userProgress UserReadingProgress[]
+
+  @@map("reading_passages")
+}
+
+model ReadingQuestion {
+  id           String              @id @default(uuid())
+  passageId    String              @map("passage_id")
+  type         String              // MULTIPLE_CHOICE, TRUE_FALSE_NG, MATCHING_HEADINGS, SUMMARY_FILL, SHORT_ANSWER
+  questionText String              @map("question_text")
+  optionsJson  Json?               @map("options_json") // Detailed options
+  correctAnswer String             @map("correct_answer")
+  explanation  String?
+  orderIndex   Int                 @map("order_index")
+  passage      ReadingPassage      @relation(fields: [passageId], references: [id])
+  userAnswers  UserReadingAnswer[]
+
+  @@map("reading_questions")
+}
+
+model UserReadingProgress {
+  id           String              @id @default(uuid())
+  userId       String              @map("user_id")
+  passageId    String              @map("passage_id")
+  timeSpent    Int?                @map("time_spent") // in seconds
+  score        Float?
+  completedAt  DateTime            @default(now()) @map("completed_at")
+  user         User                @relation(fields: [userId], references: [id])
+  passage      ReadingPassage      @relation(fields: [passageId], references: [id])
+  userAnswers  UserReadingAnswer[]
+
+  @@map("user_reading_progress")
+}
+
+model UserReadingAnswer {
+  id           String              @id @default(uuid())
+  progressId   String              @map("progress_id")
+  questionId   String              @map("question_id")
+  userAnswer   String              @map("user_answer")
+  isCorrect    Boolean             @map("is_correct")
+  progress     UserReadingProgress @relation(fields: [progressId], references: [id])
+  question     ReadingQuestion     @relation(fields: [questionId], references: [id])
+
+  @@map("user_reading_answers")
 }
 
 // --- NOTIFICATIONS ---

@@ -29,18 +29,14 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
     next();
   } catch (error) {
-    const err: AppError = new Error('Unauthorized');
-    err.statusCode = 401;
-    next(err);
+    next(new AppError('Unauthorized', 401));
   }
 };
 
 export const roleMiddleware = (allowedRoles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !allowedRoles.includes(req.user.role)) {
-      const err: AppError = new Error('Forbidden');
-      err.statusCode = 403;
-      return next(err);
+      return next(new AppError('Forbidden', 403));
     }
     next();
   };
@@ -68,18 +64,14 @@ export const adminMiddleware = roleMiddleware(['ADMIN']);
 
 export const premiumMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   if (!req.user) {
-    const err: AppError = new Error('Unauthorized');
-    err.statusCode = 401;
-    return next(err);
+    return next(new AppError('Unauthorized', 401));
   }
 
   // We should fetch the latest user status from DB or rely on JWT if it's updated
   // For now, let's assume the JWT info is sufficient or check DB
   prisma.user.findUnique({ where: { id: req.user.id } }).then(user => {
     if (!user?.isPremium) {
-      const err: AppError = new Error('Premium subscription required');
-      err.statusCode = 403;
-      return next(err);
+      return next(new AppError('Premium subscription required', 403));
     }
     next();
   }).catch(next);

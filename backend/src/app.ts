@@ -8,7 +8,15 @@ import passport from './config/passport';
 import { apiLimiter } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import logger from './config/logger';
-import apiRoutes from './modules';
+import authRoutes from './modules/auth/auth.routes';
+import courseRoutes from './modules/courses/course.routes';
+import lessonRoutes from './modules/lessons/lesson.routes';
+import vocabRoutes from './modules/vocabulary/vocabulary.router';
+import grammarRoutes from './modules/grammar/grammar.router';
+import listeningRoutes from './modules/listening/listening.router';
+import speakingRoutes from './modules/speaking/speaking.router';
+import writingRoutes from './modules/writing/writing.router';
+import readingRoutes from './modules/reading/reading.router';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 
@@ -25,7 +33,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: { write: (message) => logger.http(message.trim()) } }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', apiLimiter);
-app.use('/api/v1', apiRoutes);
+// Routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/vocabulary', vocabRoutes);
+app.use('/api/v1/grammar', grammarRoutes);
+app.use('/api/v1/listening', listeningRoutes);
+app.use('/api/v1/speaking', speakingRoutes);
+app.use('/api/v1/writing', writingRoutes);
+app.use('/api/v1/reading', readingRoutes);
+app.use('/api/v1', lessonRoutes); // Prefix is already handled inside (units/lessons/exercises)
 
 // Health Check
 app.get('/', (req, res) => {

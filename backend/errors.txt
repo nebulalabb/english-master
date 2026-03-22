@@ -1,0 +1,15 @@
+src/middleware/auth.middleware.ts(32,11): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/middleware/auth.middleware.ts(41,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/middleware/auth.middleware.ts(71,11): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/middleware/auth.middleware.ts(80,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(16,15): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(28,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(59,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(66,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(93,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(100,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(137,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(168,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(204,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/auth/auth.service.ts(211,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.
+src/modules/users/user.service.ts(30,13): error TS2741: Property 'statusCode' is missing in type 'Error' but required in type 'AppError'.

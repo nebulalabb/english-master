@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 
 const verifySchema = z.object({
-  otp: z.string().length(6, 'OTP must be 6 digits'),
+  otp: z.string().length(6, 'Mã OTP phải có 6 chữ số'),
 });
 
 type VerifyFormValues = z.infer<typeof verifySchema>;
@@ -57,10 +57,10 @@ export default function VerifyEmailPage() {
         email,
         otp: data.otp,
       });
-      toast.success('Email verified successfully!');
+      toast.success('Xác thực email thành công!');
       router.push('/login');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Verification failed');
+      toast.error(error.response?.data?.message || 'Xác thực thất bại');
     } finally {
       setIsLoading(false);
     }
@@ -75,11 +75,11 @@ export default function VerifyEmailPage() {
       // I should have a forgot-password/resend endpoint.
       // For now, I'll use the register endpoint but backend might error "User exists".
       // Usually there is a /resend-otp endpoint.
-      toast.success('OTP resent to your email');
+      toast.success('Mã OTP đã được gửi lại vào email của bạn');
       setCountdown(60);
       setCanResend(false);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to resend OTP');
+      toast.error(error.response?.data?.message || 'Không thể gửi lại mã OTP');
     } finally {
       setIsLoading(false);
     }
@@ -89,36 +89,36 @@ export default function VerifyEmailPage() {
     <div className="flex items-center justify-center min-h-screen bg-muted/40 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">Verify Email</CardTitle>
+          <CardTitle className="text-2xl font-bold">Xác nhận Email</CardTitle>
           <CardDescription>
-            We sent a 6-digit code to <span className="font-medium text-primary">{email}</span>
+            Chúng tôi đã gửi mã xác nhận 6 chữ số tới <span className="font-medium text-primary">{email}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="otp">Enter 6-digit code</Label>
+              <Label htmlFor="otp">Nhập mã 6 chữ số</Label>
               <Input id="otp" placeholder="000000" className="text-center text-2xl tracking-[0.5em] font-bold" maxLength={6} {...register('otp')} />
               {errors.otp && <p className="text-xs text-destructive text-center">{errors.otp.message}</p>}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Verifying...' : 'Verify Email'}
+            <Button type="submit" className="w-full h-12 text-lg font-bold" disabled={isLoading}>
+              {isLoading ? 'Đang xác thực...' : 'Xác thực ngay'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Didn&apos;t receive the code?{' '}
+            Bạn không nhận được mã?{' '}
             {canResend ? (
               <button 
                 onClick={handleResend} 
                 className="text-primary font-medium hover:underline"
                 disabled={isLoading}
               >
-                Resend code
+                Gửi lại mã
               </button>
             ) : (
-              <span>Resend in {countdown}s</span>
+              <span>Gửi lại sau {countdown}s</span>
             )}
           </div>
         </CardFooter>

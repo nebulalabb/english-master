@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import toast from 'react-hot-toast';
 import api from '@/lib/axios';
 import { useAuthStore } from '@/store/useAuthStore';
+import Cookies from 'js-cookie';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -49,6 +50,7 @@ export default function LoginPage() {
       const { user, accessToken } = response.data;
       
       localStorage.setItem('token', accessToken);
+      Cookies.set('token', accessToken, { expires: 7 });
       setAuth(user, accessToken);
       
       toast.success('Login successful!');

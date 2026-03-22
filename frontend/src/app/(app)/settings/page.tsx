@@ -154,7 +154,7 @@ export default function SettingsPage() {
               <CardTitle>Danger Zone</CardTitle>
             </div>
             <CardDescription>Once you delete your account, there is no going back. Please be certain.</CardDescription>
-          </Header>
+          </CardHeader>
           <CardContent>
             <Button variant="destructive" onClick={handleDeleteAccount}>Delete My Account</Button>
           </CardContent>

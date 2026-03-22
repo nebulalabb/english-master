@@ -13,8 +13,7 @@ export const validate = (schema: ZodObject<any, any>) => async (req: Request, re
         schema.parse(req.body);
         next();
     } catch (error: any) {
-        const err: AppError = new Error(error.errors[0].message);
-        err.statusCode = 400;
+        const err = new AppError(error.errors[0].message, 400);
         next(err);
     }
 };
@@ -25,9 +24,7 @@ export class AuthService {
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      const error: AppError = new Error('User already exists');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('User already exists', 400);
     }
 
     // Generate OTP
@@ -56,16 +53,12 @@ export class AuthService {
   static async verifyEmail(email: string, otp: string) {
     const storedOtp = await redisClient.get(`otp:${email}`);
     if (!storedOtp || storedOtp !== otp) {
-      const error: AppError = new Error('Invalid or expired OTP');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Invalid or expired OTP', 400);
     }
 
     const pendingUserJson = await redisClient.get(`pending_user:${email}`);
     if (!pendingUserJson) {
-      const error: AppError = new Error('Registration session expired');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Registration session expired', 400);
     }
 
     const { password, name } = JSON.parse(pendingUserJson);
@@ -90,16 +83,12 @@ export class AuthService {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.passwordHash) {
-      const error: AppError = new Error('Invalid email or password');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Invalid email or password', 401);
     }
 
     const isPasswordValid = await comparePassword(password, user.passwordHash);
     if (!isPasswordValid) {
-      const error: AppError = new Error('Invalid email or password');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Invalid email or password', 401);
     }
 
     const payload = { id: user.id, email: user.email, role: user.role };
@@ -134,9 +123,7 @@ export class AuthService {
       
       return { accessToken };
     } catch (error) {
-      const err: AppError = new Error('Invalid refresh token');
-      err.statusCode = 401;
-      throw err;
+      throw new AppError('Invalid refresh token', 401);
     }
   }
 
@@ -165,9 +152,7 @@ export class AuthService {
     const storedOtp = await redisClient.get(`reset_otp:${email}`);
 
     if (!storedOtp || storedOtp !== otp) {
-      const error: AppError = new Error('Invalid or expired OTP');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Invalid or expired OTP', 400);
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -201,16 +186,12 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user || !user.passwordHash) {
-      const error: AppError = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('User not found', 404);
     }
 
     const isPasswordValid = await comparePassword(oldPassword, user.passwordHash);
     if (!isPasswordValid) {
-      const error: AppError = new Error('Invalid current password');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Invalid current password', 400);
     }
 
     const hashedPassword = await hashPassword(newPassword);

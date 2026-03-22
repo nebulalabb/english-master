@@ -27,9 +27,7 @@ export class UserService {
     });
 
     if (!user) {
-      const error: AppError = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('User not found', 404);
     }
 
     return user;
