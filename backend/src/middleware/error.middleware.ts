@@ -19,12 +19,12 @@ export const errorHandler = (
   next: NextFunction
 ) => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  const message = err.message || 'Lỗi hệ thống nội bộ';
 
   if (err instanceof ZodError) {
     return res.status(400).json({
       status: 'error',
-      message: 'Validation failed',
+      message: 'Dữ liệu không hợp lệ',
       errors: err.issues,
     });
   }

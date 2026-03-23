@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ChevronLeft, BookOpen, Clock, AlertCircle, Info, Sparkles, Layout } from 'lucide-react';
+import { ChevronLeft, BookOpen, Clock, AlertCircle, Info, Sparkles, Layout, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,7 +90,6 @@ const ReadingDetailPage = () => {
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-         {/* Left Side: The Passage */}
          <section className="space-y-6 lg:sticky lg:top-24">
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary/40 flex items-center gap-2">
                <BookOpen className="h-3 w-3" /> Văn bản bài đọc
@@ -106,7 +105,6 @@ const ReadingDetailPage = () => {
             </div>
          </section>
 
-         {/* Right Side: Exercise Panel */}
          <section className="space-y-6">
             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary/40 flex items-center gap-2">
                <Layout className="h-3 w-3" /> Bài tập thấu hiểu

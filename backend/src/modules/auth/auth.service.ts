@@ -24,7 +24,7 @@ export class AuthService {
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      throw new AppError('User already exists', 400);
+      throw new AppError('Người dùng đã tồn tại', 400);
     }
 
     // Generate OTP
@@ -43,22 +43,22 @@ export class AuthService {
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
-      subject: 'Verify your EnglishMaster Account',
-      text: `Your OTP is: ${otp}. It expires in 5 minutes.`,
+      subject: 'Xác thực tài khoản NebulaEnglish của bạn',
+      text: `Mã OTP của bạn là: ${otp}. Mã này sẽ hết hạn sau 5 phút.`,
     });
 
-    return { message: 'OTP sent to email' };
+    return { message: 'Mã OTP đã được gửi đến email của bạn' };
   }
 
   static async verifyEmail(email: string, otp: string) {
     const storedOtp = await redisClient.get(`otp:${email}`);
     if (!storedOtp || storedOtp !== otp) {
-      throw new AppError('Invalid or expired OTP', 400);
+      throw new AppError('Mã OTP không hợp lệ hoặc đã hết hạn', 400);
     }
 
     const pendingUserJson = await redisClient.get(`pending_user:${email}`);
     if (!pendingUserJson) {
-      throw new AppError('Registration session expired', 400);
+      throw new AppError('Phiên đăng ký đã hết hạn', 400);
     }
 
     const { password, name } = JSON.parse(pendingUserJson);
@@ -81,14 +81,17 @@ export class AuthService {
   static async login(credentials: any) {
     const { email, password } = credentials;
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({ 
+      where: { email },
+      include: { placementTests: true }
+    });
     if (!user || !user.passwordHash) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Email hoặc mật khẩu không chính xác', 401);
     }
 
     const isPasswordValid = await comparePassword(password, user.passwordHash);
     if (!isPasswordValid) {
-      throw new AppError('Invalid email or password', 401);
+      throw new AppError('Email hoặc mật khẩu không chính xác', 401);
     }
 
     const payload = { id: user.id, email: user.email, role: user.role };
@@ -104,7 +107,12 @@ export class AuthService {
       },
     });
 
-    return { user, accessToken, refreshToken };
+    return { 
+      user, 
+      accessToken, 
+      refreshToken,
+      hasCompletedPlacementTest: user.hasCompletedPlacementTest 
+    };
   }
 
   static async refresh(token: string) {
@@ -115,7 +123,7 @@ export class AuthService {
       });
 
       if (!storedToken || storedToken.expiresAt < new Date()) {
-        throw new Error('Invalid or expired refresh token');
+        throw new Error('Phiên làm việc không hợp lệ hoặc đã hết hạn');
       }
 
       const payload = { id: decoded.id, email: decoded.email, role: decoded.role };
@@ -123,7 +131,7 @@ export class AuthService {
       
       return { accessToken };
     } catch (error) {
-      throw new AppError('Invalid refresh token', 401);
+      throw new AppError('Token làm mới không hợp lệ', 401);
     }
   }
 
@@ -131,7 +139,7 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       // Don't reveal if user exists for security, but we need to stop
-      return { message: 'If an account exists, an OTP has been sent' };
+      return { message: 'Nếu tài khoản tồn tại, một mã OTP đã được gửi đi' };
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -140,11 +148,11 @@ export class AuthService {
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: email,
-      subject: 'Reset your EnglishMaster Password',
-      text: `Your password reset OTP is: ${otp}. It expires in 5 minutes.`,
+      subject: 'Đặt lại mật khẩu NebulaEnglish của bạn',
+      text: `Mã OTP đặt lại mật khẩu của bạn là: ${otp}. Mã này sẽ hết hạn sau 5 phút.`,
     });
 
-    return { message: 'OTP sent to email' };
+    return { message: 'Mã OTP đã được gửi đến email của bạn' };
   }
 
   static async resetPassword(data: any) {
@@ -152,7 +160,7 @@ export class AuthService {
     const storedOtp = await redisClient.get(`reset_otp:${email}`);
 
     if (!storedOtp || storedOtp !== otp) {
-      throw new AppError('Invalid or expired OTP', 400);
+      throw new AppError('Mã OTP không hợp lệ hoặc đã hết hạn', 400);
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -162,7 +170,7 @@ export class AuthService {
     });
 
     await redisClient.del(`reset_otp:${email}`);
-    return { message: 'Password reset successful' };
+    return { message: 'Đặt lại mật khẩu thành công' };
   }
 
   static async storeRefreshToken(userId: string, token: string) {
@@ -186,12 +194,12 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (!user || !user.passwordHash) {
-      throw new AppError('User not found', 404);
+      throw new AppError('Không tìm thấy người dùng', 404);
     }
 
     const isPasswordValid = await comparePassword(oldPassword, user.passwordHash);
     if (!isPasswordValid) {
-      throw new AppError('Invalid current password', 400);
+      throw new AppError('Mật khẩu hiện tại không chính xác', 400);
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -200,6 +208,6 @@ export class AuthService {
       data: { passwordHash: hashedPassword },
     });
 
-    return { message: 'Password changed successfully' };
+    return { message: 'Thay đổi mật khẩu thành công' };
   }
 }

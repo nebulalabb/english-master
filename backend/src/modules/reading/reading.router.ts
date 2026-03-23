@@ -10,5 +10,6 @@ router.use(authMiddleware);
 router.get('/passages', controller.getPassages);
 router.get('/passages/:id', controller.getPassageById);
 router.post('/passages/:id/submit', controller.submitAnswers);
+router.post('/vocabulary/lookup', controller.lookupVocabulary);
 
 export default router;

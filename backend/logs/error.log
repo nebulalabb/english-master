@@ -33,3 +33,17 @@
 2026-03-22 15:04:41:441 [31merror[39m: [31m401 - Unauthorized - /api/v1/courses/course-beginner/progress - GET - ::1[39m
 2026-03-22 15:04:41:441 [31merror[39m: [31m401 - Unauthorized - /api/v1/courses/course-beginner/progress - GET - ::1[39m
 2026-03-22 15:04:47:447 [31merror[39m: [31m401 - Unauthorized - /api/v1/courses/course-beginner/enroll - POST - ::1[39m
+2026-03-22 15:38:26:3826 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-22 15:38:33:3833 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 09:46:57:4657 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 09:47:18:4718 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 09:54:03:543 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:01:39:139 [31merror[39m: [31m401 - Invalid email or password - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:03:11:311 [31merror[39m: [31m401 - Email hoặc mật khẩu không chính xác - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:03:16:316 [31merror[39m: [31m401 - Email hoặc mật khẩu không chính xác - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:09:25:925 [31merror[39m: [31m401 - Email hoặc mật khẩu không chính xác - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:10:10:1010 [31merror[39m: [31m403 - Not enrolled in this course - /api/v1/courses/course-beginner/progress - GET - ::1[39m
+2026-03-23 10:10:10:1010 [31merror[39m: [31m403 - Not enrolled in this course - /api/v1/courses/course-beginner/progress - GET - ::1[39m
+2026-03-23 10:12:15:1215 [31merror[39m: [31m401 - Email hoặc mật khẩu không chính xác - /api/v1/auth/login - POST - ::1[39m
+2026-03-23 10:19:14:1914 [31merror[39m: [31m401 - Unauthorized - /api/v1/placement-test/questions - GET - ::1[39m
+2026-03-23 10:19:14:1914 [31merror[39m: [31m401 - Unauthorized - /api/v1/placement-test/questions - GET - ::1[39m

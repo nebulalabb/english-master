@@ -5,10 +5,17 @@ export class PlacementTestService {
     // In a real app, we might fetch from ExamQuestion with a specific type
     // or a predefined list for placement.
     // For now, let's fetch any 40 questions or mock them.
-    return await prisma.examQuestion.findMany({
+    const questions = await prisma.examQuestion.findMany({
       take: 40,
       orderBy: { orderIndex: 'asc' },
     });
+
+    return questions.map(q => ({
+      id: q.id,
+      text: q.questionText,
+      options: q.optionsJson as string[],
+      skill: q.skill,
+    }));
   }
 
   static async submitTest(userId: string, answers: { questionId: string, answer: string }[]) {
@@ -41,7 +48,7 @@ export class PlacementTestService {
     // Update user level
     await prisma.user.update({
       where: { id: userId },
-      data: { level },
+      data: { level, hasCompletedPlacementTest: true },
     });
 
     // Create placement test record

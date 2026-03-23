@@ -16,7 +16,34 @@ export class AuthController {
     try {
       const { email, otp } = req.body;
       const user = await AuthService.verifyEmail(email, otp);
-      res.status(201).json({ message: 'User verified and created', user });
+
+      // Generate tokens for auto-login
+      const payload = { id: user.id, email: user.email, role: user.role };
+      const accessToken = generateAccessToken(payload);
+      const refreshToken = generateRefreshToken(payload);
+
+      // Store refresh token
+      await AuthService.storeRefreshToken(user.id, refreshToken);
+
+      // Set cookie for refresh token
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(201).json({ 
+        message: 'Người dùng đã xác thực và đăng nhập', 
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          hasCompletedPlacementTest: false,
+        },
+        accessToken 
+      });
     } catch (error) {
       next(error);
     }
@@ -24,7 +51,7 @@ export class AuthController {
 
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { user, accessToken, refreshToken } = await AuthService.login(req.body);
+      const { user, accessToken, refreshToken, hasCompletedPlacementTest } = await AuthService.login(req.body);
 
       // Set cookie for refresh token
       res.cookie('refreshToken', refreshToken, {
@@ -40,6 +67,7 @@ export class AuthController {
           email: user.email,
           name: user.name,
           role: user.role,
+          hasCompletedPlacementTest,
         },
         accessToken,
       });
@@ -87,7 +115,7 @@ export class AuthController {
         await AuthService.logout(refreshToken);
       }
       res.clearCookie('refreshToken');
-      res.status(200).json({ message: 'Logged out' });
+      res.status(200).json({ message: 'Đã đăng xuất' });
     } catch (error) {
       next(error);
     }

@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Volume2, Bookmark, Share2, Type, Maximize2, X, Sparkles, Languages } from 'lucide-react';
+import { Volume2, Bookmark, Type, X, Sparkles, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import axios from 'axios';
+import axios from '@/lib/axios';
 
 interface PassageViewerProps {
   content: string;
@@ -31,8 +30,9 @@ const PassageViewer: React.FC<PassageViewerProps> = ({ content }) => {
       
       try {
         setIsSearching(true);
-        const response = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
-        setDefinition(response.data[0]);
+        // Using our own backend proxy for better control/CORS
+        const response = await axios.post('/reading/vocabulary/lookup', { word });
+        setDefinition(response.data);
       } catch (err) {
         setDefinition(null);
       } finally {
@@ -54,8 +54,8 @@ const PassageViewer: React.FC<PassageViewerProps> = ({ content }) => {
   };
 
   const addToVocab = async () => {
-    // Logic to add to user's vocab list
-    alert(`Đã thêm "${selectedWord}" vào danh sách từ vựng!`);
+    // This will be connected to the Vocab module later
+    alert(`Đã thêm "${selectedWord}" vào danh sách học từ!`);
   };
 
   return (
@@ -114,10 +114,10 @@ const PassageViewer: React.FC<PassageViewerProps> = ({ content }) => {
               ) : definition ? (
                 <div className="space-y-3">
                    <div className="text-xs font-black uppercase tracking-widest text-primary/40 flex items-center gap-1">
-                      <Languages className="h-3 w-3" /> Nghĩa của từ
+                      <Languages className="h-3 w-3" /> {definition.meanings?.[0]?.partOfSpeech || 'Definition'}
                    </div>
                    <p className="text-sm font-medium leading-relaxed line-clamp-3">
-                      {definition.meanings[0].definitions[0].definition}
+                      {definition.meanings?.[0]?.definitions?.[0]?.definition || 'No definition found.'}
                    </p>
                    <div className="flex gap-2 pt-2">
                       <Button size="sm" className="flex-1 rounded-xl h-9 gap-1.5 font-bold" onClick={playPronunciation}>
@@ -136,7 +136,7 @@ const PassageViewer: React.FC<PassageViewerProps> = ({ content }) => {
             </div>
             <div className="bg-primary/5 p-3 flex items-center justify-center gap-2">
                <Sparkles className="h-3 w-3 text-primary" />
-               <span className="text-[10px] font-black uppercase text-primary/60">AI Dictionary Enabled</span>
+               <span className="text-[10px] font-black uppercase text-primary/60">Dictionary API Connected</span>
             </div>
           </motion.div>
         )}

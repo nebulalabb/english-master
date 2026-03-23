@@ -14,12 +14,14 @@ interface User {
   lives: number;
   isPremium: boolean;
   learningGoals?: string;
+  hasCompletedPlacementTest: boolean;
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   setAuth: (user: User, token: string) => void;
+  updateUser: (data: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -31,6 +33,11 @@ export const useAuthStore = create<AuthState>()(
       setAuth: (user, token) => {
         Cookies.set('token', token, { expires: 7 });
         set({ user, token });
+      },
+      updateUser: (data) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...data } : null,
+        }));
       },
       logout: () => {
         Cookies.remove('token');

@@ -339,6 +339,75 @@ Ngày nay, trà được trồng ở nhiều quốc gia, bao gồm Ấn Độ, S
     }
   });
 
+  // --- Seed Placement Test ---
+  const placementSet = await prisma.examSet.upsert({
+    where: { id: 'placement-test-set' },
+    update: {},
+    create: {
+      id: 'placement-test-set',
+      title: 'Initial Placement Test',
+      type: 'PLACEMENT',
+      level: 'ALL',
+      durationMinutes: 30,
+    },
+  });
+
+  const placementQuestions = [
+    {
+      id: 'pt-q1',
+      examSetId: placementSet.id,
+      skill: 'GRAMMAR',
+      questionText: 'I ___ a student.',
+      optionsJson: ['am', 'is', 'are', 'be'],
+      correctAnswer: 'am',
+      orderIndex: 1,
+    },
+    {
+      id: 'pt-q2',
+      examSetId: placementSet.id,
+      skill: 'VOCABULARY',
+      questionText: 'Which word is a fruit?',
+      optionsJson: ['Car', 'Apple', 'Book', 'Phone'],
+      correctAnswer: 'Apple',
+      orderIndex: 2,
+    },
+    {
+      id: 'pt-q3',
+      examSetId: placementSet.id,
+      skill: 'GRAMMAR',
+      questionText: 'He ___ to the park every Sunday.',
+      optionsJson: ['go', 'goes', 'going', 'gone'],
+      correctAnswer: 'goes',
+      orderIndex: 3,
+    },
+    {
+      id: 'pt-q4',
+      examSetId: placementSet.id,
+      skill: 'READING',
+      questionText: 'If it is raining, you should take an ___.',
+      optionsJson: ['Umbrella', 'Sunscreen', 'Sunglasses', 'Hat'],
+      correctAnswer: 'Umbrella',
+      orderIndex: 4,
+    },
+    {
+      id: 'pt-q5',
+      examSetId: placementSet.id,
+      skill: 'GRAMMAR',
+      questionText: 'They ___ playing football now.',
+      optionsJson: ['is', 'am', 'are', 'was'],
+      correctAnswer: 'are',
+      orderIndex: 5,
+    },
+  ];
+
+  for (const q of placementQuestions) {
+    await prisma.examQuestion.upsert({
+      where: { id: q.id },
+      update: {},
+      create: q,
+    });
+  }
+
   console.log('Seed finished.');
 }
 

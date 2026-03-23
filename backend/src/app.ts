@@ -17,6 +17,7 @@ import listeningRoutes from './modules/listening/listening.router';
 import speakingRoutes from './modules/speaking/speaking.router';
 import writingRoutes from './modules/writing/writing.router';
 import readingRoutes from './modules/reading/reading.router';
+import placementTestRoutes from './modules/placement-test/placement-test.routes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 
@@ -42,6 +43,7 @@ app.use('/api/v1/listening', listeningRoutes);
 app.use('/api/v1/speaking', speakingRoutes);
 app.use('/api/v1/writing', writingRoutes);
 app.use('/api/v1/reading', readingRoutes);
+app.use('/api/v1/placement-test', placementTestRoutes);
 app.use('/api/v1', lessonRoutes); // Prefix is already handled inside (units/lessons/exercises)
 
 // Health Check

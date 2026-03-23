@@ -15,7 +15,14 @@ export class PlacementTestController {
     try {
       const userId = (req as any).user.id;
       const { answers } = req.body;
-      const result = await PlacementTestService.submitTest(userId, answers);
+      
+      // Transform Record<string, string> to { questionId: string, answer: string }[]
+      const answersArray = Object.entries(answers).map(([questionId, answer]) => ({
+        questionId,
+        answer: answer as string,
+      }));
+
+      const result = await PlacementTestService.submitTest(userId, answersArray);
       res.status(200).json(result);
     } catch (error) {
       next(error);

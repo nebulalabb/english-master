@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Circle, AlertCircle, HelpCircle, Trophy, RotateCcw, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Circle, XCircle, AlertCircle, HelpCircle, Trophy, RotateCcw, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -58,7 +58,7 @@ const ExercisePanel: React.FC<ExercisePanelProps> = ({ questions, onFinish, isSu
   if (showResult && evaluation) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
-        <Card className="rounded-[2.5rem] border-none shadow-2xl bg-gradient-to-br from-primary to-primary-foreground text-white overflow-hidden relative">
+        <Card className="rounded-[2.5rem] border-none shadow-2xl bg-gradient-to-br from-primary to-primary-foreground text-white overflow-hidden relative" style={{ background: '#E11D48' }}>
            <div className="absolute top-0 right-0 p-8 opacity-10">
               <Trophy className="h-48 w-48" />
            </div>

@@ -1,14 +1,14 @@
 'use client';
 
+// Integrated Textarea component
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, FileText, BarChart2, Info, CheckCircle, AlertCircle, Sparkles, BookOpen, Quote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '../ui/progress';
+import { Textarea } from '../ui/textarea';
 import axios from '@/lib/axios';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 
 interface WritingEditorProps {
   prompt: any;
@@ -66,7 +66,7 @@ const WritingEditor: React.FC<WritingEditorProps> = ({ prompt, onSuccess }) => {
               placeholder="Bắt đầu viết tại đây..."
               className="min-h-[400px] rounded-[1.5rem] border-border/40 bg-card p-8 text-lg leading-relaxed focus:ring-primary/20 resize-none relative z-10"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)}
               disabled={isSubmitting}
             />
           </div>
