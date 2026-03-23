@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard – EnglishMaster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+  /* ═══════════════════════════════════════
+     DESIGN TOKENS
+  ═══════════════════════════════════════ */
+  :root{
+    --primary:#FF6B35; --primary-light:#FF9966; --primary-dark:#E85A20;
+    --secondary:#4ECDC4; --accent:#FFD93D; --purple:#A78BFA; --green:#6BCB77;
+    --bg:#FFF8F3; --surface:#FFFFFF;
+    --text-dark:#1E1B4B; --text-mid:#4B5563; --text-light:#9CA3AF; --border:#E5E7EB;
+    --shadow-sm:0 2px 8px rgba(255,107,53,.1);
+    --shadow-md:0 6px 24px rgba(30,27,75,.08);
+    --radius:14px; --radius-sm:10px; --radius-xs:7px;
+    --sidebar-w:240px; --topbar-h:64px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);-webkit-font-smoothing:antialiased;display:flex}
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(255,107,53,.25);border-radius:10px}
+
+  /* ── Animations ── */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+  @keyframes barGrow{from{height:0;opacity:0}to{opacity:1}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  @keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+
+  /* ════════════════════════════════════════
+     SIDEBAR
+  ════════════════════════════════════════ */
+  .sidebar{
+    width:var(--sidebar-w);min-width:var(--sidebar-w);
+    height:100vh;
+    background:var(--text-dark);
+    display:flex;flex-direction:column;
+    position:fixed;left:0;top:0;z-index:50;
+    overflow:hidden;
+    transition:width .25s ease;
+  }
+
+  /* Logo */
+  .sb-logo{
+    height:var(--topbar-h);display:flex;align-items:center;gap:10px;
+    padding:0 20px;flex-shrink:0;
+    border-bottom:1px solid rgba(255,255,255,.07);
+  }
+  .sb-logo-icon{
+    width:36px;height:36px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    box-shadow:0 4px 12px rgba(255,107,53,.4);
+  }
+  .sb-logo-text{font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;color:#fff;white-space:nowrap}
+  .sb-logo-text span{color:var(--primary-light)}
+
+  /* Nav sections */
+  .sb-body{flex:1;overflow-y:auto;padding:16px 0}
+  .sb-section-label{
+    font-size:10px;font-weight:800;color:rgba(255,255,255,.28);
+    text-transform:uppercase;letter-spacing:.7px;
+    padding:0 20px;margin:20px 0 6px;
+  }
+  .sb-section-label:first-child{margin-top:4px}
+
+  .nav-item{
+    display:flex;align-items:center;gap:11px;
+    padding:10px 20px;border-radius:0;
+    font-size:14px;font-weight:700;color:rgba(255,255,255,.55);
+    text-decoration:none;cursor:pointer;
+    transition:all .18s;position:relative;white-space:nowrap;
+    border:none;background:none;width:100%;text-align:left;
+  }
+  .nav-item:hover{color:#fff;background:rgba(255,255,255,.06)}
+  .nav-item.active{
+    color:#fff;
+    background:linear-gradient(90deg,rgba(255,107,53,.25) 0%,transparent 100%);
+  }
+  .nav-item.active::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+    background:linear-gradient(180deg,var(--primary),var(--primary-light));
+    border-radius:0 3px 3px 0;
+  }
+  .nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+  .nav-item.active .nav-icon,.nav-item:hover .nav-icon{opacity:1}
+  .nav-badge{
+    margin-left:auto;padding:2px 8px;border-radius:50px;
+    font-size:11px;font-weight:800;
+    background:var(--primary);color:#fff;
+  }
+
+  /* Sidebar footer – user card */
+  .sb-user{
+    border-top:1px solid rgba(255,255,255,.07);
+    padding:14px 16px;display:flex;align-items:center;gap:10px;
+    flex-shrink:0;cursor:pointer;transition:background .18s;
+  }
+  .sb-user:hover{background:rgba(255,255,255,.05)}
+  .sb-avatar{
+    width:36px;height:36px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;font-weight:900;color:#fff;
+    border:2px solid rgba(255,255,255,.15);
+  }
+  .sb-user-name{font-size:13px;font-weight:800;color:#fff;line-height:1.2}
+  .sb-user-level{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);margin-top:1px}
+  .sb-user-arrow{margin-left:auto;color:rgba(255,255,255,.3);font-size:14px}
+
+  /* ════════════════════════════════════════
+     MAIN AREA
+  ════════════════════════════════════════ */
+  .main-area{
+    margin-left:var(--sidebar-w);
+    flex:1;
+    display:flex;flex-direction:column;
+    height:100vh;
+    overflow:hidden;
+    min-width:0;
+  }
+
+  /* ── Topbar ── */
+  .topbar{
+    height:var(--topbar-h);flex-shrink:0;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:16px;
+    padding:0 28px;
+    box-shadow:0 1px 8px rgba(0,0,0,.04);
+    position:sticky;top:0;z-index:30;
+  }
+  .topbar-greeting{flex:1}
+  .topbar-greeting h2{
+    font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;color:var(--text-dark);line-height:1.1;
+  }
+  .topbar-greeting h2 span{color:var(--primary)}
+  .topbar-greeting p{font-size:12px;font-weight:600;color:var(--text-light);margin-top:1px}
+
+  /* Streak pill */
+  .streak-pill{
+    display:flex;align-items:center;gap:6px;
+    background:rgba(255,107,53,.08);border:1.5px solid rgba(255,107,53,.2);
+    border-radius:50px;padding:6px 14px;
+    font-size:13px;font-weight:800;color:var(--primary);white-space:nowrap;
+  }
+
+  /* XP pill */
+  .xp-pill{
+    display:flex;align-items:center;gap:6px;
+    background:rgba(30,27,75,.06);border:1.5px solid rgba(30,27,75,.1);
+    border-radius:50px;padding:6px 14px;
+    font-size:13px;font-weight:800;color:var(--text-dark);white-space:nowrap;
+  }
+
+  /* Lives */
+  .lives-display{display:flex;align-items:center;gap:3px}
+  .heart{font-size:16px;line-height:1}
+  .heart.empty{opacity:.22;filter:grayscale(1)}
+
+  /* Notification bell */
+  .notif-btn{
+    position:relative;width:38px;height:38px;border-radius:10px;
+    background:var(--bg);border:1.5px solid var(--border);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .18s;color:var(--text-mid);
+  }
+  .notif-btn:hover{border-color:var(--primary);color:var(--primary)}
+  .notif-dot{
+    position:absolute;top:6px;right:6px;
+    width:8px;height:8px;border-radius:50%;
+    background:var(--primary);border:1.5px solid var(--surface);
+    animation:pulse 2s infinite;
+  }
+
+  /* User menu */
+  .user-menu-btn{
+    display:flex;align-items:center;gap:8px;
+    padding:5px 12px 5px 5px;border-radius:50px;
+    background:var(--bg);border:1.5px solid var(--border);
+    cursor:pointer;transition:all .18s;
+  }
+  .user-menu-btn:hover{border-color:var(--primary)}
+  .topbar-avatar{
+    width:30px;height:30px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:900;color:#fff;
+  }
+  .topbar-username{font-size:13px;font-weight:800;color:var(--text-dark)}
+
+  /* ── Scrollable content ── */
+  .content{flex:1;overflow-y:auto;padding:24px 28px 40px}
+
+  /* Grid layout */
+  .dash-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    grid-template-rows:auto;
+    gap:18px;
+  }
+
+  /* Cards */
+  .card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);
+    overflow:hidden;
+    animation:fadeUp .5s ease both;
+  }
+  .card-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 18px 0;margin-bottom:14px;
+  }
+  .card-title{font-size:13px;font-weight:800;color:var(--text-dark)}
+  .card-action{font-size:12px;font-weight:700;color:var(--primary);text-decoration:none;cursor:pointer;transition:opacity .18s}
+  .card-action:hover{opacity:.7}
+  .card-body{padding:0 18px 18px}
+
+  /* ── Greeting card (col span 2) ── */
+  .card-greeting{
+    grid-column:1/3;
+    background:linear-gradient(130deg,#FF6B35 0%,#FF9966 55%,#FFD93D 100%);
+    border:none;position:relative;overflow:hidden;
+  }
+  .card-greeting::before{
+    content:'';position:absolute;inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='22' fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='1'/%3E%3C/svg%3E");
+    background-size:60px 60px;
+  }
+  .greeting-inner{
+    position:relative;z-index:1;
+    display:flex;align-items:center;gap:24px;
+    padding:22px 24px;
+  }
+  .greeting-avatar{
+    width:64px;height:64px;border-radius:50%;flex-shrink:0;
+    background:rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    font-size:30px;border:3px solid rgba(255,255,255,.4);
+    box-shadow:0 4px 16px rgba(0,0,0,.12);
+  }
+  .greeting-text h2{font-family:'Baloo 2',cursive;font-size:22px;font-weight:800;color:#fff;line-height:1.15;text-shadow:0 1px 6px rgba(0,0,0,.1)}
+  .greeting-text p{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);margin-top:4px}
+  .greeting-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .greeting-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.3);
+    border-radius:50px;padding:4px 12px;
+    font-size:12px;font-weight:800;color:#fff;
+  }
+  .greeting-right{margin-left:auto;text-align:right;flex-shrink:0}
+  .level-ring-wrap{position:relative;display:inline-block}
+  .level-ring-label{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .level-num{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:#fff;line-height:1}
+  .level-txt{font-size:9px;font-weight:800;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.4px}
+
+  /* ── Continue Learning card ── */
+  .card-continue{grid-column:3/4;grid-row:1/3;display:flex;flex-direction:column}
+  .continue-lesson{
+    display:flex;align-items:flex-start;gap:12px;
+    background:var(--bg);border-radius:var(--radius-sm);
+    padding:14px;margin-bottom:12px;border:1.5px solid var(--border);
+    cursor:pointer;transition:all .18s;
+  }
+  .continue-lesson:hover{border-color:var(--primary);box-shadow:var(--shadow-sm)}
+  .lesson-icon{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+  }
+  .lesson-name{font-size:14px;font-weight:800;color:var(--text-dark);line-height:1.3;margin-bottom:4px}
+  .lesson-unit{font-size:11.5px;font-weight:600;color:var(--text-light);margin-bottom:8px}
+  .lesson-progress-bar{height:6px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:4px}
+  .lesson-progress-fill{
+    height:100%;border-radius:10px;
+    background:linear-gradient(90deg,var(--primary),var(--primary-light));
+    position:relative;overflow:hidden;
+  }
+  .lesson-progress-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 2s infinite}
+  .lesson-pct{font-size:11px;font-weight:700;color:var(--primary)}
+
+  .btn-continue{
+    width:100%;padding:11px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    border:none;cursor:pointer;box-shadow:0 4px 16px rgba(255,107,53,.35);
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    transition:all .2s;margin-top:auto;
+  }
+  .btn-continue:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,107,53,.45)}
+  .btn-continue .arrow{transition:transform .2s}
+  .btn-continue:hover .arrow{transform:translateX(4px)}
+
+  /* ── Today's tasks ── */
+  .task-item{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 0;border-bottom:1px solid var(--border);
+  }
+  .task-item:last-child{border-bottom:none}
+  .task-icon{
+    width:38px;height:38px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+  }
+  .task-label{font-size:14px;font-weight:700;color:var(--text-dark);line-height:1.3}
+  .task-sub{font-size:11.5px;font-weight:600;color:var(--text-light);margin-top:1px}
+  .task-arrow{margin-left:auto;color:var(--text-light);font-size:16px;flex-shrink:0;cursor:pointer;transition:color .18s}
+  .task-item:hover .task-arrow{color:var(--primary)}
+  .task-badge{
+    margin-left:auto;padding:3px 9px;border-radius:50px;
+    font-size:11px;font-weight:800;white-space:nowrap;
+  }
+
+  /* ── XP Level Card ── */
+  .xp-card-inner{padding:0 18px 18px}
+  .xp-level-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .xp-level-name{font-family:'Baloo 2',cursive;font-size:15px;font-weight:800;color:var(--text-dark)}
+  .xp-next{font-size:12px;font-weight:700;color:var(--text-light)}
+  .xp-bar-track{height:14px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:7px;position:relative}
+  .xp-bar-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--text-dark) 0%,var(--primary) 100%);
+    border-radius:10px;position:relative;overflow:hidden;
+    transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .xp-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:shimmer 2.5s infinite}
+  .xp-bar-label{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-size:10px;font-weight:900;color:#fff;
+  }
+  .xp-sub{font-size:12px;font-weight:600;color:var(--text-light)}
+  .xp-sub strong{color:var(--primary)}
+
+  /* ── Streak Calendar ── */
+  .streak-cal{padding:0 18px 18px}
+  .cal-month{font-size:13px;font-weight:800;color:var(--text-mid);margin-bottom:10px;text-align:center}
+  .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+  .cal-day-name{font-size:10px;font-weight:700;color:var(--text-light);text-align:center}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cal-day{
+    aspect-ratio:1;border-radius:5px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10.5px;font-weight:700;color:var(--text-light);
+    background:var(--bg);
+  }
+  .cal-day.studied{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff}
+  .cal-day.today{background:var(--text-dark);color:#fff}
+  .cal-day.missed{background:rgba(239,68,68,.12);color:rgb(239,68,68)}
+  .cal-day.empty{background:transparent}
+
+  /* ── Leaderboard mini ── */
+  .lb-list{padding:0 18px 18px;display:flex;flex-direction:column;gap:8px}
+  .lb-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:var(--radius-sm);
+    transition:background .15s;
+  }
+  .lb-item:hover{background:var(--bg)}
+  .lb-item.me{background:rgba(255,107,53,.06);border:1.5px solid rgba(255,107,53,.15)}
+  .lb-rank-num{
+    width:24px;height:24px;border-radius:7px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:900;
+  }
+  .lb-av{
+    width:32px;height:32px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:900;color:#fff;
+  }
+  .lb-name{font-size:13px;font-weight:700;color:var(--text-dark);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lb-xp{font-size:12px;font-weight:800;color:var(--primary);white-space:nowrap}
+
+  /* ── Upcoming Reviews ── */
+  .review-list{padding:0 18px 18px;display:flex;flex-direction:column;gap:7px}
+  .review-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 12px;border-radius:var(--radius-sm);
+    background:var(--bg);border:1.5px solid var(--border);
+    cursor:pointer;transition:all .18s;
+  }
+  .review-item:hover{border-color:var(--primary);box-shadow:var(--shadow-sm)}
+  .review-word{font-size:14px;font-weight:800;color:var(--text-dark)}
+  .review-phonetic{font-size:11.5px;font-weight:600;color:var(--text-light);margin-top:1px}
+  .review-urgency{
+    margin-left:auto;padding:3px 9px;border-radius:50px;
+    font-size:11px;font-weight:800;
+  }
+
+  /* ── Recent Badges ── */
+  .badges-row{display:flex;gap:12px;padding:0 18px 18px}
+  .badge-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:14px 8px;border-radius:var(--radius-sm);
+    background:var(--bg);border:1.5px solid var(--border);
+    cursor:pointer;transition:all .2s;text-align:center;
+  }
+  .badge-item:hover{border-color:var(--primary);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+  .badge-emoji{font-size:28px;animation:float 3s ease-in-out infinite}
+  .badge-emoji:nth-child(1){animation-delay:0s}
+  .badge-emoji:nth-child(2){animation-delay:.5s}
+  .badge-emoji:nth-child(3){animation-delay:1s}
+  .badge-name{font-size:11.5px;font-weight:800;color:var(--text-dark);line-height:1.3}
+  .badge-date{font-size:10.5px;font-weight:600;color:var(--text-light)}
+  .badge-new{font-size:9.5px;font-weight:800;background:var(--primary);color:#fff;padding:1px 7px;border-radius:50px}
+
+  /* ── Weekly Activity Bar Chart ── */
+  .chart-wrap{padding:0 18px 18px}
+  .chart-bars{
+    display:flex;align-items:flex-end;justify-content:space-between;gap:6px;
+    height:80px;
+  }
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .bar-track{flex:1;width:100%;background:var(--bg);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end;cursor:pointer;transition:opacity .18s}
+  .bar-track:hover{opacity:.8}
+  .bar-fill{
+    width:100%;border-radius:4px;
+    background:linear-gradient(180deg,var(--primary),var(--primary-light));
+    transition:height .8s cubic-bezier(.4,0,.2,1);
+    animation:barGrow .8s ease both;
+  }
+  .bar-fill.accent{background:linear-gradient(180deg,var(--accent),var(--primary-light))}
+  .bar-fill.today-bar{background:linear-gradient(180deg,var(--text-dark),#4338CA)}
+  .bar-label{font-size:10px;font-weight:700;color:var(--text-light)}
+  .bar-val{font-size:9.5px;font-weight:800;color:var(--primary);min-height:12px}
+
+  /* ── Stats overview row ── */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .stat-mini{
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);
+    padding:14px 16px;
+    animation:fadeUp .5s ease both;
+    display:flex;align-items:center;gap:12px;
+  }
+  .stat-mini-icon{
+    width:40px;height:40px;border-radius:11px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+  }
+  .stat-mini-val{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:var(--text-dark);line-height:1}
+  .stat-mini-label{font-size:11px;font-weight:700;color:var(--text-light);margin-top:3px}
+
+  /* ── Notification dropdown ── */
+  .notif-panel{
+    position:fixed;top:calc(var(--topbar-h) + 8px);right:28px;
+    width:320px;
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);
+    box-shadow:0 16px 48px rgba(0,0,0,.12);
+    z-index:100;
+    display:none;
+    animation:fadeUp .2s ease both;
+  }
+  .notif-panel.open{display:block}
+  .notif-panel-header{
+    padding:14px 18px 10px;display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);
+  }
+  .notif-panel-title{font-size:14px;font-weight:800;color:var(--text-dark)}
+  .notif-mark-all{font-size:12px;font-weight:700;color:var(--primary);cursor:pointer;border:none;background:none}
+  .notif-list{max-height:320px;overflow-y:auto}
+  .notif-item{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:12px 18px;border-bottom:1px solid var(--border);
+    cursor:pointer;transition:background .15s;
+  }
+  .notif-item:hover{background:var(--bg)}
+  .notif-item:last-child{border-bottom:none}
+  .notif-item.unread{background:rgba(255,107,53,.04)}
+  .notif-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+  .notif-text{font-size:13px;font-weight:600;color:var(--text-mid);line-height:1.5}
+  .notif-text strong{color:var(--text-dark)}
+  .notif-time{font-size:11px;font-weight:600;color:var(--text-light);margin-top:3px}
+  .notif-unread-dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px}
+
+  /* ── AI Recommendation chip ── */
+  .ai-rec-label{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:11px;font-weight:800;color:var(--purple);
+    background:rgba(167,139,250,.1);border-radius:50px;
+    padding:2px 9px;margin-bottom:10px;
+  }
+
+  /* ── Responsive ── */
+  @media(max-width:1100px){
+    :root{--sidebar-w:200px}
+    .dash-grid{grid-template-columns:1fr 1fr}
+    .card-greeting{grid-column:1/3}
+    .card-continue{grid-column:auto;grid-row:auto}
+  }
+  @media(max-width:760px){
+    .sidebar{transform:translateX(-100%)}
+    .main-area{margin-left:0}
+    .dash-grid{grid-template-columns:1fr}
+    .card-greeting{grid-column:1/2}
+    .stats-row{grid-template-columns:1fr 1fr}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+  <div class="sb-logo">
+    <div class="sb-logo-icon">🌟</div>
+    <div class="sb-logo-text">English<span>Master</span></div>
+  </div>
+
+  <div class="sb-body">
+
+    <div class="sb-section-label">Tổng quan</div>
+
+    <a href="/dashboard" class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="/stats" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Thống kê
+    </a>
+    <a href="/journal" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Nhật ký học
+    </a>
+
+    <div class="sb-section-label">Học tập</div>
+
+    <a href="/courses" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Khóa học
+    </a>
+    <a href="/vocabulary" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Từ vựng
+      <span class="nav-badge">12</span>
+    </a>
+    <a href="/grammar" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      Ngữ pháp
+    </a>
+    <a href="/listening" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3v5z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3v5z"/></svg>
+      Nghe hiểu
+    </a>
+    <a href="/speaking" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      Nói & Phát âm
+    </a>
+    <a href="/writing" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Viết
+    </a>
+    <a href="/reading" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Đọc hiểu
+    </a>
+
+    <div class="sb-section-label">AI & Luyện thi</div>
+
+    <a href="/ai/chat" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Chat luyện nói
+      <span class="nav-badge" style="background:var(--purple)">PRO</span>
+    </a>
+    <a href="/exams" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Luyện đề IELTS/TOEIC
+    </a>
+
+    <div class="sb-section-label">Cộng đồng</div>
+
+    <a href="/leaderboard" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l4-4 4 4"/><path d="M12 2v10.3"/><path d="M8 18H5a2 2 0 0 0-2 2v1h18v-1a2 2 0 0 0-2-2h-3"/><path d="M8 18v-5a4 4 0 0 1 8 0v5"/></svg>
+      Bảng xếp hạng
+    </a>
+    <a href="/forum" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Cộng đồng
+    </a>
+    <a href="/shop" class="nav-item">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cửa hàng XP
+    </a>
+  </div>
+
+  <!-- User card -->
+  <div class="sb-user">
+    <div class="sb-avatar">B</div>
+    <div>
+      <div class="sb-user-name">Nguyễn Minh Bảo</div>
+      <div class="sb-user-level">⚡ 1,240 XP · Upper-Int.</div>
+    </div>
+    <div class="sb-user-arrow">›</div>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════
+     MAIN AREA
+════════════════════════════════════════ -->
+<div class="main-area">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-greeting">
+      <h2>Chào buổi sáng, <span>Bảo!</span> ☀️</h2>
+      <p>Thứ Hai, 23/3/2026 · Streak 30 ngày · Hôm nay chưa học</p>
+    </div>
+
+    <div class="streak-pill">🔥 30 ngày</div>
+    <div class="xp-pill">⚡ 1,240 XP</div>
+
+    <div class="lives-display" title="5/5 lives">
+      <span class="heart">❤️</span><span class="heart">❤️</span>
+      <span class="heart">❤️</span><span class="heart">❤️</span><span class="heart">❤️</span>
+    </div>
+
+    <!-- Notification bell -->
+    <button class="notif-btn" onclick="toggleNotif()" id="notifBtn" title="Thông báo">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="notif-dot"></div>
+    </button>
+
+    <div class="user-menu-btn">
+      <div class="topbar-avatar">B</div>
+      <span class="topbar-username">Bảo</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+  </div>
+
+  <!-- Notification panel -->
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+      <div class="notif-panel-title">🔔 Thông báo <span style="font-size:11px;font-weight:700;background:var(--primary);color:#fff;padding:1px 8px;border-radius:50px;margin-left:6px">3</span></div>
+      <button class="notif-mark-all">Đánh dấu đã đọc</button>
+    </div>
+    <div class="notif-list">
+      <div class="notif-item unread">
+        <div class="notif-icon">🔥</div>
+        <div style="flex:1">
+          <div class="notif-text"><strong>Streak 30 ngày!</strong> Bạn vừa đạt cột mốc 30 ngày học liên tiếp. Nhận ngay +200 XP!</div>
+          <div class="notif-time">5 phút trước</div>
+        </div>
+        <div class="notif-unread-dot"></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon">🏅</div>
+        <div style="flex:1">
+          <div class="notif-text">Bạn vừa mở khóa badge <strong>"Speaking Star"</strong>. Xem chi tiết trong trang Profile.</div>
+          <div class="notif-time">2 giờ trước</div>
+        </div>
+        <div class="notif-unread-dot"></div>
+      </div>
+      <div class="notif-item unread">
+        <div class="notif-icon">📚</div>
+        <div style="flex:1">
+          <div class="notif-text"><strong>12 từ vựng</strong> đến hạn ôn tập hôm nay. Ôn ngay để không quên!</div>
+          <div class="notif-time">4 giờ trước</div>
+        </div>
+        <div class="notif-unread-dot"></div>
+      </div>
+      <div class="notif-item">
+        <div class="notif-icon">🏆</div>
+        <div style="flex:1">
+          <div class="notif-text">Bạn đã tụt xuống hạng <strong>#12</strong> trên bảng xếp hạng tuần. Học thêm để leo lên!</div>
+          <div class="notif-time">Hôm qua</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="content">
+
+    <!-- Stats overview row -->
+    <div class="stats-row">
+      <div class="stat-mini" style="animation-delay:.05s">
+        <div class="stat-mini-icon" style="background:rgba(255,107,53,.1)">⏱️</div>
+        <div>
+          <div class="stat-mini-val">48h</div>
+          <div class="stat-mini-label">Tổng thời gian học</div>
+        </div>
+      </div>
+      <div class="stat-mini" style="animation-delay:.1s">
+        <div class="stat-mini-icon" style="background:rgba(78,205,196,.1)">📖</div>
+        <div>
+          <div class="stat-mini-val">850</div>
+          <div class="stat-mini-label">Từ vựng đã học</div>
+        </div>
+      </div>
+      <div class="stat-mini" style="animation-delay:.15s">
+        <div class="stat-mini-icon" style="background:rgba(107,203,119,.1)">✅</div>
+        <div>
+          <div class="stat-mini-val">124</div>
+          <div class="stat-mini-label">Bài học hoàn thành</div>
+        </div>
+      </div>
+      <div class="stat-mini" style="animation-delay:.2s">
+        <div class="stat-mini-icon" style="background:rgba(167,139,250,.1)">🎯</div>
+        <div>
+          <div class="stat-mini-val">82%</div>
+          <div class="stat-mini-label">Điểm trung bình</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard grid -->
+    <div class="dash-grid">
+
+      <!-- ── Greeting card (col 1–2) ── -->
+      <div class="card card-greeting" style="animation-delay:.1s">
+        <div class="greeting-inner">
+          <div class="greeting-avatar">🧑‍🎓</div>
+          <div class="greeting-text">
+            <h2>Tiếp tục thôi, Bảo! 💪</h2>
+            <p>Bạn đang ở trình độ <strong style="color:#fff">Upper-Intermediate (B2)</strong> · Mục tiêu: IELTS 7.0</p>
+            <div class="greeting-badges">
+              <span class="greeting-badge">🔥 Streak 30 ngày</span>
+              <span class="greeting-badge">⚡ 1,240 XP tuần này</span>
+              <span class="greeting-badge">🏆 Hạng #12 tuần này</span>
+              <span class="greeting-badge">🏅 3 badge mới</span>
+            </div>
+          </div>
+          <div class="greeting-right">
+            <!-- SVG circular progress for level -->
+            <div class="level-ring-wrap">
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <circle cx="38" cy="38" r="32" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="5"/>
+                <circle cx="38" cy="38" r="32" fill="none" stroke="#fff" stroke-width="5"
+                  stroke-dasharray="201" stroke-dashoffset="60"
+                  stroke-linecap="round" transform="rotate(-90 38 38)"/>
+              </svg>
+              <div class="level-ring-label">
+                <span class="level-num">B2</span>
+                <span class="level-txt">Level</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Continue Learning (col 3, row 1–2) ── -->
+      <div class="card card-continue" style="animation-delay:.15s">
+        <div class="card-header">
+          <div class="card-title">📚 Tiếp tục học</div>
+          <a href="/courses" class="card-action">Tất cả →</a>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;flex:1;gap:10px">
+          <!-- Current lesson -->
+          <div class="continue-lesson">
+            <div class="lesson-icon" style="background:rgba(255,107,53,.1)">🔤</div>
+            <div style="flex:1">
+              <div class="lesson-name">Present Perfect Continuous</div>
+              <div class="lesson-unit">Unit 4 · Ngữ pháp B2</div>
+              <div class="lesson-progress-bar">
+                <div class="lesson-progress-fill" style="width:62%"></div>
+              </div>
+              <div class="lesson-pct">62% hoàn thành · còn 8 bài tập</div>
+            </div>
+          </div>
+          <!-- Next lesson -->
+          <div class="continue-lesson" style="opacity:.7">
+            <div class="lesson-icon" style="background:rgba(78,205,196,.1)">👂</div>
+            <div style="flex:1">
+              <div class="lesson-name">Academic Listening – Lecture</div>
+              <div class="lesson-unit">Unit 5 · Nghe IELTS</div>
+              <div class="lesson-progress-bar">
+                <div class="lesson-progress-fill" style="width:0%"></div>
+              </div>
+              <div class="lesson-pct" style="color:var(--text-light)">Chưa bắt đầu</div>
+            </div>
+          </div>
+          <button class="btn-continue" onclick="location.href='/learn'">
+            Tiếp tục học
+            <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── Today's Tasks – AI Recommendations ── -->
+      <div class="card" style="animation-delay:.2s">
+        <div class="card-header">
+          <div>
+            <div class="ai-rec-label">🤖 AI Gợi ý</div>
+            <div class="card-title">Hôm nay cần làm</div>
+          </div>
+          <a href="#" class="card-action">Xem thêm →</a>
+        </div>
+        <div class="card-body">
+          <div class="task-item">
+            <div class="task-icon" style="background:rgba(255,107,53,.1)">🔤</div>
+            <div>
+              <div class="task-label">Ôn tập ngữ pháp Past Perfect</div>
+              <div class="task-sub">Bạn hay sai ở Unit 3 · ~10 phút</div>
+            </div>
+            <span class="task-badge" style="background:rgba(255,107,53,.12);color:var(--primary)">Yếu điểm</span>
+          </div>
+          <div class="task-item">
+            <div class="task-icon" style="background:rgba(78,205,196,.12)">📖</div>
+            <div>
+              <div class="task-label">Ôn 12 từ vựng đến hạn</div>
+              <div class="task-sub">Spaced repetition · ~8 phút</div>
+            </div>
+            <span class="task-badge" style="background:rgba(239,68,68,.1);color:rgb(220,38,38)">Hôm nay</span>
+          </div>
+          <div class="task-item">
+            <div class="task-icon" style="background:rgba(107,203,119,.12)">🗣️</div>
+            <div>
+              <div class="task-label">Luyện phát âm với AI</div>
+              <div class="task-sub">Scenario: Đặt phòng khách sạn</div>
+            </div>
+            <span class="task-badge" style="background:rgba(167,139,250,.12);color:#7C3AED">PRO</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── XP & Level Progress ── -->
+      <div class="card" style="animation-delay:.25s">
+        <div class="card-header">
+          <div class="card-title">⚡ XP & Cấp độ</div>
+          <a href="/stats" class="card-action">Chi tiết →</a>
+        </div>
+        <div class="xp-card-inner">
+          <div class="xp-level-row">
+            <div class="xp-level-name">Upper-Intermediate</div>
+            <div class="xp-next">Level tiếp: Advanced</div>
+          </div>
+          <div class="xp-bar-track">
+            <div class="xp-bar-fill" id="xpFill" style="width:74%">
+              <div class="xp-bar-label">1,240 / 1,680 XP</div>
+            </div>
+          </div>
+          <div class="xp-sub">Cần thêm <strong>440 XP</strong> để đạt Advanced · Học 3 bài nữa là xong 🚀</div>
+
+          <!-- Weekly XP mini chart -->
+          <div style="margin-top:14px">
+            <div style="font-size:11.5px;font-weight:700;color:var(--text-light);margin-bottom:8px">XP 7 ngày gần nhất</div>
+            <div class="chart-bars">
+              <div class="bar-col"><div class="bar-val">80</div><div class="bar-track" title="Thứ Hai: 80 XP"><div class="bar-fill" style="height:45%"></div></div><div class="bar-label">T2</div></div>
+              <div class="bar-col"><div class="bar-val">140</div><div class="bar-track" title="Thứ Ba: 140 XP"><div class="bar-fill" style="height:75%"></div></div><div class="bar-label">T3</div></div>
+              <div class="bar-col"><div class="bar-val">60</div><div class="bar-track" title="Thứ Tư: 60 XP"><div class="bar-fill" style="height:33%"></div></div><div class="bar-label">T4</div></div>
+              <div class="bar-col"><div class="bar-val">190</div><div class="bar-track" title="Thứ Năm: 190 XP"><div class="bar-fill accent" style="height:100%"></div></div><div class="bar-label">T5</div></div>
+              <div class="bar-col"><div class="bar-val">120</div><div class="bar-track" title="Thứ Sáu: 120 XP"><div class="bar-fill" style="height:63%"></div></div><div class="bar-label">T6</div></div>
+              <div class="bar-col"><div class="bar-val">90</div><div class="bar-track" title="Thứ Bảy: 90 XP"><div class="bar-fill" style="height:48%"></div></div><div class="bar-label">T7</div></div>
+              <div class="bar-col"><div class="bar-val">–</div><div class="bar-track" title="Hôm nay: chưa học"><div class="bar-fill today-bar" style="height:8%"></div></div><div class="bar-label" style="color:var(--primary);font-weight:800">CN</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Streak Calendar ── -->
+      <div class="card" style="animation-delay:.3s">
+        <div class="card-header">
+          <div class="card-title">🔥 Streak Calendar</div>
+          <span style="font-size:12px;font-weight:800;color:var(--primary)">30 ngày 🔥</span>
+        </div>
+        <div class="streak-cal">
+          <div class="cal-month">Tháng 3, 2026</div>
+          <div class="cal-days-header">
+            <div class="cal-day-name">CN</div><div class="cal-day-name">T2</div>
+            <div class="cal-day-name">T3</div><div class="cal-day-name">T4</div>
+            <div class="cal-day-name">T5</div><div class="cal-day-name">T6</div>
+            <div class="cal-day-name">T7</div>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:flex;gap:10px;margin-top:10px;font-size:11px;font-weight:700;color:var(--text-light)">
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:3px;display:inline-block"></span> Đã học</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:rgba(239,68,68,.2);border-radius:3px;display:inline-block"></span> Bỏ lỡ</span>
+            <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:var(--text-dark);border-radius:3px;display:inline-block"></span> Hôm nay</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Mini Leaderboard ── -->
+      <div class="card" style="animation-delay:.35s">
+        <div class="card-header">
+          <div class="card-title">🏆 Bảng xếp hạng</div>
+          <a href="/leaderboard" class="card-action">Xem đầy đủ →</a>
+        </div>
+        <div class="lb-list">
+          <div class="lb-item">
+            <div class="lb-rank-num" style="background:linear-gradient(135deg,#FFD93D,#FF9966);color:#fff">🥇</div>
+            <div class="lb-av" style="background:linear-gradient(135deg,#FF6B35,#FF9966)">N</div>
+            <div class="lb-name">Nguyễn Minh Tuấn</div>
+            <div class="lb-xp">3,840 XP</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank-num" style="background:linear-gradient(135deg,#9CA3AF,#D1D5DB);color:#fff">🥈</div>
+            <div class="lb-av" style="background:linear-gradient(135deg,#4ECDC4,#6BCB77)">T</div>
+            <div class="lb-name">Trần Thị Lan Anh</div>
+            <div class="lb-xp">3,210 XP</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank-num" style="background:linear-gradient(135deg,#CD7F32,#D97706);color:#fff">🥉</div>
+            <div class="lb-av" style="background:linear-gradient(135deg,#A78BFA,#8B5CF6)">L</div>
+            <div class="lb-name">Lê Hoàng Nam</div>
+            <div class="lb-xp">2,950 XP</div>
+          </div>
+          <div style="text-align:center;font-size:12px;font-weight:600;color:var(--text-light);padding:4px 0">· · · · · ·</div>
+          <div class="lb-item me">
+            <div class="lb-rank-num" style="background:rgba(255,107,53,.15);color:var(--primary);font-size:12px;font-weight:900">#12</div>
+            <div class="lb-av" style="background:linear-gradient(135deg,var(--primary),var(--accent))">B</div>
+            <div class="lb-name" style="color:var(--primary);font-weight:800">Bạn (Bảo) 👈</div>
+            <div class="lb-xp">1,240 XP</div>
+          </div>
+          <div class="lb-item">
+            <div class="lb-rank-num" style="background:rgba(156,163,175,.12);color:var(--text-light);font-size:11px">#13</div>
+            <div class="lb-av" style="background:linear-gradient(135deg,#6BCB77,#4ECDC4)">H</div>
+            <div class="lb-name">Hồ Thị Mai</div>
+            <div class="lb-xp">1,190 XP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Upcoming Reviews ── -->
+      <div class="card" style="animation-delay:.4s">
+        <div class="card-header">
+          <div class="card-title">🗂️ Từ vựng cần ôn</div>
+          <a href="/vocabulary" class="card-action">Ôn tập ngay →</a>
+        </div>
+        <div class="review-list">
+          <div class="review-item">
+            <div>
+              <div class="review-word">Procrastinate</div>
+              <div class="review-phonetic">/prəˈkræstɪneɪt/ · Động từ</div>
+            </div>
+            <div class="review-urgency" style="background:rgba(239,68,68,.1);color:rgb(220,38,38)">Hôm nay</div>
+          </div>
+          <div class="review-item">
+            <div>
+              <div class="review-word">Perseverance</div>
+              <div class="review-phonetic">/ˌpɜrsɪˈvɪrəns/ · Danh từ</div>
+            </div>
+            <div class="review-urgency" style="background:rgba(239,68,68,.1);color:rgb(220,38,38)">Hôm nay</div>
+          </div>
+          <div class="review-item">
+            <div>
+              <div class="review-word">Benevolent</div>
+              <div class="review-phonetic">/bɪˈnevələnt/ · Tính từ</div>
+            </div>
+            <div class="review-urgency" style="background:rgba(255,217,61,.15);color:#B45309">Ngày mai</div>
+          </div>
+          <div class="review-item">
+            <div>
+              <div class="review-word">Convoluted</div>
+              <div class="review-phonetic">/ˈkɒnvəluːtɪd/ · Tính từ</div>
+            </div>
+            <div class="review-urgency" style="background:rgba(107,203,119,.12);color:#2E8B3A">2 ngày nữa</div>
+          </div>
+          <div style="text-align:center;padding-top:8px">
+            <a href="/vocabulary" style="font-size:12px;font-weight:800;color:var(--primary);text-decoration:none">
+              + 8 từ nữa cần ôn →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Recent Badges ── -->
+      <div class="card" style="animation-delay:.45s">
+        <div class="card-header">
+          <div class="card-title">🏅 Huy hiệu gần đây</div>
+          <a href="/profile" class="card-action">Tất cả →</a>
+        </div>
+        <div class="badges-row">
+          <div class="badge-item">
+            <div class="badge-emoji">🔥</div>
+            <div class="badge-name">Streak Master</div>
+            <div class="badge-date">Hôm nay</div>
+            <div class="badge-new">Mới!</div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-emoji">🗣️</div>
+            <div class="badge-name">Speaking Star</div>
+            <div class="badge-date">2 giờ trước</div>
+            <div class="badge-new">Mới!</div>
+          </div>
+          <div class="badge-item">
+            <div class="badge-emoji">📖</div>
+            <div class="badge-name">Word Wizard</div>
+            <div class="badge-date">Hôm qua</div>
+            <div class="badge-date" style="color:var(--text-light)">850 từ</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.dash-grid -->
+  </div><!-- /.content -->
+</div><!-- /.main-area -->
+
+<script>
+/* ── Streak Calendar render ── */
+(function() {
+  const grid = document.getElementById('calGrid')
+  // March 2026: starts on Sunday (day 0), 31 days
+  const firstDay = 0 // Sunday
+  const totalDays = 31
+  const today = 23 // March 23
+  // studied days (last 30 days = March 1–22 minus a couple missed)
+  const missed = [6, 14] // missed March 6 and 14
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div')
+    el.className = 'cal-day empty'
+    grid.appendChild(el)
+  }
+  for (let d = 1; d <= totalDays; d++) {
+    const el = document.createElement('div')
+    if (d === today) {
+      el.className = 'cal-day today'
+      el.textContent = d
+    } else if (d > today) {
+      el.className = 'cal-day'
+      el.textContent = d
+    } else if (missed.includes(d)) {
+      el.className = 'cal-day missed'
+      el.textContent = d
+    } else {
+      el.className = 'cal-day studied'
+      el.textContent = d
+    }
+    grid.appendChild(el)
+  }
+})()
+
+/* ── XP bar animate on load ── */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const fill = document.getElementById('xpFill')
+    if (fill) fill.style.width = '74%'
+  }, 300)
+})
+
+/* ── Notification panel ── */
+function toggleNotif() {
+  const panel = document.getElementById('notifPanel')
+  panel.classList.toggle('open')
+}
+document.addEventListener('click', (e) => {
+  const btn = document.getElementById('notifBtn')
+  const panel = document.getElementById('notifPanel')
+  if (!btn.contains(e.target) && !panel.contains(e.target)) {
+    panel.classList.remove('open')
+  }
+})
+</script>
+</body>
+</html>

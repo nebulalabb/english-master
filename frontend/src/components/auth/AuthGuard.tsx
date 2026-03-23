@@ -21,7 +21,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       if (!token && !isPublicPath) {
         router.push('/login');
       } else if (token && isPublicPath) {
-        router.push('/');
+        router.push('/dashboard');
       }
     }
   }, [token, pathname, router, isReady]);

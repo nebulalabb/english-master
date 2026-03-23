@@ -35,7 +35,7 @@ export default function PlacementTestPage() {
 
   useEffect(() => {
     if (user?.hasCompletedPlacementTest) {
-      router.push('/');
+      router.push('/dashboard');
       return;
     }
     fetchQuestions();
@@ -102,10 +102,10 @@ export default function PlacementTestPage() {
           <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">Chưa có câu hỏi nào</h2>
           <p className="text-slate-500 font-bold mb-8 max-w-md mx-auto">Hiện tại bài kiểm tra năng lực đang được cập nhật. Vui lòng quay lại sau!</p>
           <Button 
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="btn-submit !w-auto !px-10"
           >
-            Quay lại Trang chủ
+            Quay lại Dashboard
           </Button>
         </div>
       </div>
@@ -225,7 +225,7 @@ export default function PlacementTestPage() {
                 </div>
 
                 <Button 
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/dashboard')}
                   className="btn-submit"
                 >
                   Vào Dashboard <ArrowRight className="h-5 w-5 ml-2" />

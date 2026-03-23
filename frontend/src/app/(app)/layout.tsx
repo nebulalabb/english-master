@@ -2,6 +2,7 @@
 
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Topbar } from '@/components/layout/Topbar';
+import '@/styles/dashboard.css';
 
 export default function AppLayout({
   children,
@@ -9,11 +10,11 @@ export default function AppLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="dashboard-root">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="db-main-area">
         <Topbar />
-        <main className="flex-1 overflow-y-auto p-8 bg-background">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>

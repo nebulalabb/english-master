@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EnglishMaster – Nền Tảng Học Tiếng Anh Thông Minh</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+  /* ═══════════════════════════════════════════
+     DESIGN TOKENS
+  ═══════════════════════════════════════════ */
+  :root{
+    --primary:#FF6B35; --primary-light:#FF9966; --primary-dark:#E85A20;
+    --secondary:#4ECDC4; --accent:#FFD93D; --purple:#A78BFA; --green:#6BCB77;
+    --bg:#FFF8F3; --surface:#FFFFFF;
+    --text-dark:#1E1B4B; --text-mid:#4B5563; --text-light:#9CA3AF; --border:#E5E7EB;
+    --shadow-sm:0 2px 8px rgba(255,107,53,.12);
+    --shadow-md:0 8px 32px rgba(255,107,53,.14);
+    --shadow-lg:0 20px 60px rgba(255,107,53,.18);
+    --radius:16px; --radius-sm:10px; --radius-xs:8px;
+    --nav-h:68px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text-dark);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+  /* ── utils ── */
+  .container{max-width:1160px;margin:0 auto;padding:0 24px}
+  .section{padding:96px 0}
+  .section-sm{padding:64px 0}
+  .tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:50px;font-size:12px;font-weight:700}
+
+  /* ── animations ── */
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes float2{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes slideLeft{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+  @keyframes spin-slow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes pulse-dot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
+  .anim-fade-up{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+  .anim-fade-up.visible{opacity:1;transform:translateY(0)}
+
+  /* ════════════════════════════════════════
+     NAVBAR
+  ════════════════════════════════════════ */
+  .navbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    height:var(--nav-h);
+    background:rgba(255,248,243,.92);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(229,231,235,.6);
+    transition:box-shadow .3s;
+  }
+  .navbar.scrolled{box-shadow:0 4px 24px rgba(0,0,0,.07)}
+  .nav-inner{
+    height:100%;display:flex;align-items:center;gap:32px;
+    max-width:1160px;margin:0 auto;padding:0 24px;
+  }
+  .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+  .nav-logo-icon{
+    width:38px;height:38px;border-radius:11px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+    box-shadow:0 4px 12px rgba(255,107,53,.35);
+  }
+  .nav-logo-text{font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:var(--text-dark)}
+  .nav-logo-text span{color:var(--primary)}
+  .nav-links{display:flex;align-items:center;gap:4px;flex:1}
+  .nav-link{
+    padding:6px 14px;border-radius:8px;font-size:14px;font-weight:700;
+    color:var(--text-mid);text-decoration:none;transition:all .18s;white-space:nowrap;
+  }
+  .nav-link:hover{color:var(--primary);background:rgba(255,107,53,.07)}
+  .nav-link.active{color:var(--primary)}
+  .nav-spacer{flex:1}
+  .nav-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .btn-ghost{
+    padding:8px 18px;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;
+    font-size:14px;font-weight:700;color:var(--text-mid);
+    background:none;border:2px solid var(--border);cursor:pointer;
+    text-decoration:none;transition:all .18s;
+  }
+  .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
+  .btn-primary{
+    padding:8px 22px;border-radius:var(--radius-sm);font-family:'Nunito',sans-serif;
+    font-size:14px;font-weight:800;color:#fff;cursor:pointer;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    border:none;box-shadow:0 4px 16px rgba(255,107,53,.38);
+    text-decoration:none;transition:all .2s;
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(255,107,53,.5)}
+
+  /* ════════════════════════════════════════
+     HERO
+  ════════════════════════════════════════ */
+  .hero{
+    min-height:100vh;display:flex;align-items:center;
+    padding-top:var(--nav-h);
+    position:relative;overflow:hidden;
+  }
+  /* Gradient bg blobs */
+  .hero-blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+  .hero-blob-1{width:600px;height:600px;background:rgba(255,107,53,.12);top:-200px;right:-150px}
+  .hero-blob-2{width:400px;height:400px;background:rgba(78,205,196,.1);bottom:-100px;left:-100px}
+  .hero-blob-3{width:260px;height:260px;background:rgba(167,139,250,.1);top:30%;left:30%}
+
+  .hero-inner{
+    position:relative;z-index:1;
+    display:grid;grid-template-columns:1fr 1fr;
+    align-items:center;gap:60px;
+    max-width:1160px;margin:0 auto;padding:60px 24px;
+    width:100%;
+  }
+  .hero-left{animation:fadeUp .7s ease both}
+  .hero-tag{background:rgba(255,107,53,.1);color:var(--primary)}
+
+  .hero-title{
+    font-family:'Baloo 2',cursive;
+    font-size:clamp(36px,4.5vw,56px);
+    font-weight:800;line-height:1.12;
+    color:var(--text-dark);margin-bottom:20px;
+  }
+  .hero-title .line2{color:var(--primary)}
+  .hero-title .line3{
+    position:relative;display:inline-block;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .hero-desc{
+    font-size:17px;font-weight:500;color:var(--text-mid);
+    line-height:1.7;margin-bottom:32px;max-width:480px;
+  }
+  .hero-cta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:40px}
+  .btn-hero-primary{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:14px 28px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    border:none;cursor:pointer;box-shadow:0 6px 24px rgba(255,107,53,.42);
+    text-decoration:none;transition:all .25s;
+  }
+  .btn-hero-primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(255,107,53,.55)}
+  .btn-hero-primary .arrow{transition:transform .25s}
+  .btn-hero-primary:hover .arrow{transform:translateX(4px)}
+
+  .btn-hero-secondary{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 24px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;
+    color:var(--text-dark);background:var(--surface);
+    border:2px solid var(--border);cursor:pointer;
+    text-decoration:none;transition:all .2s;
+  }
+  .btn-hero-secondary:hover{border-color:var(--primary);color:var(--primary)}
+
+  /* Social proof row */
+  .hero-social-proof{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+  .avatar-stack{display:flex}
+  .avatar-stack img,.avatar-item{
+    width:34px;height:34px;border-radius:50%;
+    border:2.5px solid #fff;margin-left:-10px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:800;color:#fff;
+  }
+  .avatar-stack .avatar-item:first-child{margin-left:0}
+  .social-text{font-size:13px;font-weight:700;color:var(--text-mid)}
+  .social-text strong{color:var(--text-dark)}
+  .star-row{display:flex;align-items:center;gap:4px}
+  .star{color:var(--accent);font-size:15px}
+  .star-label{font-size:13px;font-weight:700;color:var(--text-mid)}
+
+  /* Hero right – app mockup illustration */
+  .hero-right{
+    display:flex;align-items:center;justify-content:center;
+    animation:slideLeft .8s ease .2s both;
+    position:relative;
+  }
+  .hero-phone{
+    position:relative;z-index:2;
+    width:100%;max-width:440px;
+  }
+  .app-mockup{
+    background:var(--surface);border-radius:24px;
+    box-shadow:0 24px 80px rgba(30,27,75,.14),0 4px 16px rgba(0,0,0,.06);
+    overflow:hidden;border:1.5px solid rgba(229,231,235,.8);
+    animation:float 4s ease-in-out infinite;
+  }
+  /* Mockup top bar */
+  .mockup-topbar{
+    height:52px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;padding:0 18px;gap:10px;
+  }
+  .mockup-logo{font-family:'Baloo 2',cursive;font-size:16px;font-weight:800;color:#fff}
+  .mockup-streak{
+    margin-left:auto;display:flex;align-items:center;gap:5px;
+    background:rgba(255,255,255,.22);border-radius:50px;padding:4px 10px;
+    font-size:12px;font-weight:800;color:#fff;
+  }
+  /* Mockup body */
+  .mockup-body{padding:18px}
+  .mockup-greeting{
+    font-family:'Baloo 2',cursive;font-size:17px;font-weight:800;
+    color:var(--text-dark);margin-bottom:14px;
+  }
+  .mockup-greeting span{color:var(--primary)}
+  /* Progress card */
+  .mockup-progress-card{
+    background:linear-gradient(135deg,#fff7f3,#fff);
+    border:1.5px solid rgba(255,107,53,.15);
+    border-radius:12px;padding:14px;margin-bottom:14px;
+  }
+  .mpc-label{font-size:11px;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .mpc-title{font-size:14px;font-weight:800;color:var(--text-dark);margin-bottom:10px}
+  .mpc-bar{height:8px;background:var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
+  .mpc-fill{height:100%;width:62%;background:linear-gradient(90deg,var(--primary),var(--primary-light));border-radius:10px}
+  .mpc-meta{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text-light)}
+  .mpc-meta span:last-child{color:var(--primary)}
+  /* Skill chips */
+  .mockup-skills{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+  .skill-chip{
+    border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;
+    border:1.5px solid var(--border);background:var(--surface);
+  }
+  .skill-chip-ico{font-size:18px}
+  .skill-chip-name{font-size:12px;font-weight:800;color:var(--text-dark)}
+  .skill-chip-sub{font-size:10.5px;font-weight:600;color:var(--text-light);margin-top:1px}
+  /* XP bar */
+  .mockup-xp{
+    background:linear-gradient(135deg,var(--text-dark),#2d2878);
+    border-radius:12px;padding:12px 14px;
+    display:flex;align-items:center;gap:12px;
+  }
+  .xp-icon{font-size:22px}
+  .xp-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:3px}
+  .xp-bar{height:6px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden;flex:1}
+  .xp-fill{height:100%;width:74%;background:linear-gradient(90deg,var(--accent),var(--primary-light));border-radius:10px}
+  .xp-val{font-size:12px;font-weight:800;color:var(--accent)}
+
+  /* Floating badges on hero right */
+  .float-badge{
+    position:absolute;
+    background:var(--surface);border-radius:14px;
+    padding:10px 14px;box-shadow:0 8px 28px rgba(0,0,0,.12);
+    display:flex;align-items:center;gap:9px;
+    font-size:13px;font-weight:700;color:var(--text-dark);
+    white-space:nowrap;z-index:3;
+    animation:float2 3.5s ease-in-out infinite;
+  }
+  .float-badge .badge-icon{font-size:22px}
+  .float-badge .badge-val{font-size:16px;font-weight:900;color:var(--primary);line-height:1}
+  .float-badge .badge-sub{font-size:10px;font-weight:600;color:var(--text-light);line-height:1;margin-top:2px}
+  .fb-streak{top:-16px;left:-20px;animation-delay:.3s}
+  .fb-badge{bottom:-16px;right:-14px;animation-delay:1s}
+  .fb-rank{top:40%;right:-60px;animation-delay:.7s}
+
+  /* ════════════════════════════════════════
+     STATS BAND
+  ════════════════════════════════════════ */
+  .stats-band{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 55%,var(--accent) 100%);
+    padding:36px 0;position:relative;overflow:hidden;
+  }
+  .stats-band::before{
+    content:'';position:absolute;inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='30' fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='1'/%3E%3C/svg%3E");
+    background-size:80px 80px;
+  }
+  .stats-grid{
+    position:relative;z-index:1;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+  }
+  .stat-item{
+    text-align:center;padding:0 24px;
+    border-right:1px solid rgba(255,255,255,.2);
+  }
+  .stat-item:last-child{border-right:none}
+  .stat-num{
+    font-family:'Baloo 2',cursive;font-size:36px;font-weight:800;color:#fff;
+    text-shadow:0 2px 8px rgba(0,0,0,.1);line-height:1;
+  }
+  .stat-label{font-size:14px;font-weight:600;color:rgba(255,255,255,.85);margin-top:5px}
+
+  /* ════════════════════════════════════════
+     FEATURES – 6 SKILLS
+  ════════════════════════════════════════ */
+  .section-header{text-align:center;margin-bottom:56px}
+  .section-title{font-family:'Baloo 2',cursive;font-size:clamp(28px,3.5vw,40px);font-weight:800;color:var(--text-dark);line-height:1.15;margin-bottom:12px}
+  .section-title span{color:var(--primary)}
+  .section-desc{font-size:16px;font-weight:500;color:var(--text-mid);max-width:540px;margin:0 auto;line-height:1.7}
+
+  .skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .skill-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);padding:28px 26px;
+    transition:all .25s ease;cursor:default;
+    position:relative;overflow:hidden;
+  }
+  .skill-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:4px;
+    border-radius:var(--radius) var(--radius) 0 0;
+    opacity:0;transition:opacity .25s;
+  }
+  .skill-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:transparent}
+  .skill-card:hover::before{opacity:1}
+
+  .skill-card-icon{
+    width:54px;height:54px;border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:26px;margin-bottom:16px;
+  }
+  .skill-card-title{font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;color:var(--text-dark);margin-bottom:8px}
+  .skill-card-desc{font-size:14px;font-weight:500;color:var(--text-mid);line-height:1.65}
+  .skill-card-features{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px}
+  .skill-feat{
+    font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:50px;
+  }
+
+  /* ════════════════════════════════════════
+     AI FEATURES
+  ════════════════════════════════════════ */
+  .ai-section{background:var(--text-dark);position:relative;overflow:hidden}
+  .ai-section::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 70% 50%, rgba(167,139,250,.12) 0%, transparent 60%),
+               radial-gradient(ellipse at 20% 80%, rgba(78,205,196,.1) 0%, transparent 50%);
+  }
+  .ai-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:72px}
+  .ai-left .section-title{color:#fff}
+  .ai-left .section-title span{color:var(--accent)}
+  .ai-left .section-desc{color:rgba(255,255,255,.65);text-align:left;max-width:440px;margin:0 0 36px}
+  .ai-left .tag{background:rgba(167,139,250,.18);color:#c4b5fd}
+
+  .ai-cards{display:flex;flex-direction:column;gap:14px}
+  .ai-card{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;padding:18px 20px;
+    display:flex;align-items:flex-start;gap:14px;
+    transition:all .2s;cursor:default;
+  }
+  .ai-card:hover{background:rgba(255,255,255,.1);border-color:rgba(167,139,250,.4);transform:translateX(4px)}
+  .ai-card-icon{
+    width:44px;height:44px;min-width:44px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;font-size:22px;
+  }
+  .ai-card-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px}
+  .ai-card-desc{font-size:13px;font-weight:500;color:rgba(255,255,255,.55);line-height:1.55}
+
+  /* AI Chat demo mockup */
+  .chat-demo{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;overflow:hidden;
+  }
+  .chat-topbar{
+    padding:14px 18px;display:flex;align-items:center;gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.04);
+  }
+  .chat-avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--purple),#6d28d9);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+  }
+  .chat-name{font-size:14px;font-weight:800;color:#fff}
+  .chat-status{font-size:11px;font-weight:600;color:var(--green);margin-top:1px}
+  .chat-scenario{
+    margin-left:auto;padding:4px 10px;border-radius:50px;
+    background:rgba(107,203,119,.15);color:var(--green);
+    font-size:11px;font-weight:700;
+  }
+  .chat-body{padding:16px;display:flex;flex-direction:column;gap:10px;max-height:280px;overflow:hidden}
+  .msg{display:flex;gap:8px;align-items:flex-end;max-width:85%}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse}
+  .msg-bubble{
+    padding:10px 14px;border-radius:14px;
+    font-size:13px;font-weight:600;line-height:1.5;
+  }
+  .msg.ai .msg-bubble{
+    background:rgba(255,255,255,.1);color:rgba(255,255,255,.9);
+    border-bottom-left-radius:4px;
+  }
+  .msg.user .msg-bubble{
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    color:#fff;border-bottom-right-radius:4px;
+  }
+  .msg-error{
+    font-size:11px;padding:3px 8px;background:rgba(255,107,53,.2);
+    border-radius:6px;color:#fca;margin-top:4px;
+    border:1px solid rgba(255,107,53,.3);
+  }
+  .chat-input-bar{
+    padding:12px 14px;border-top:1px solid rgba(255,255,255,.08);
+    display:flex;gap:8px;align-items:center;
+    background:rgba(255,255,255,.03);
+  }
+  .chat-input{
+    flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:8px;padding:8px 12px;font-size:13px;color:rgba(255,255,255,.6);
+    font-family:'Nunito',sans-serif;font-weight:600;
+  }
+  .chat-send{
+    width:34px;height:34px;border-radius:8px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;
+  }
+
+  /* ════════════════════════════════════════
+     GAMIFICATION
+  ════════════════════════════════════════ */
+  .game-section{background:var(--surface);position:relative;overflow:hidden}
+  .game-section::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 90% 10%, rgba(255,107,53,.06) 0%, transparent 55%),
+               radial-gradient(ellipse at 10% 90%, rgba(255,217,61,.06) 0%, transparent 55%);
+  }
+  .game-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:72px}
+  .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .game-card{
+    background:var(--bg);border-radius:14px;padding:20px;
+    border:1.5px solid var(--border);transition:all .2s;cursor:default;
+  }
+  .game-card:hover{border-color:var(--primary);box-shadow:var(--shadow-sm);transform:translateY(-2px)}
+  .game-card-icon{font-size:28px;margin-bottom:10px}
+  .game-card-title{font-size:15px;font-weight:800;color:var(--text-dark);margin-bottom:5px}
+  .game-card-desc{font-size:13px;font-weight:500;color:var(--text-mid);line-height:1.5}
+
+  /* Leaderboard card */
+  .leaderboard-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);overflow:hidden;
+    box-shadow:var(--shadow-md);
+  }
+  .lb-header{
+    padding:14px 20px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;gap:8px;
+  }
+  .lb-title{font-family:'Baloo 2',cursive;font-size:16px;font-weight:800;color:#fff}
+  .lb-period{margin-left:auto;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);
+    background:rgba(255,255,255,.2);padding:3px 10px;border-radius:50px;}
+  .lb-row{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 20px;border-bottom:1px solid var(--border);
+    transition:background .15s;
+  }
+  .lb-row:last-child{border-bottom:none}
+  .lb-row:hover{background:var(--bg)}
+  .lb-rank{
+    width:26px;height:26px;border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:900;flex-shrink:0;
+  }
+  .lb-avatar{
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;flex-shrink:0;
+  }
+  .lb-name{font-size:14px;font-weight:700;color:var(--text-dark);flex:1}
+  .lb-xp{font-size:13px;font-weight:800;color:var(--primary)}
+  .lb-badge{font-size:16px}
+
+  /* ════════════════════════════════════════
+     EXAM PREP
+  ════════════════════════════════════════ */
+  .exam-section{background:var(--bg)}
+  .exam-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .exam-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:1.5px solid var(--border);overflow:hidden;
+    transition:all .25s;cursor:default;
+  }
+  .exam-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:transparent}
+  .exam-card-header{height:100px;display:flex;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden}
+  .exam-card-header::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.08)}
+  .exam-card-title-big{font-family:'Baloo 2',cursive;font-size:32px;font-weight:800;color:#fff;position:relative;z-index:1;text-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .exam-card-body{padding:22px 22px 24px}
+  .exam-card-name{font-family:'Baloo 2',cursive;font-size:18px;font-weight:800;color:var(--text-dark);margin-bottom:6px}
+  .exam-card-desc{font-size:13.5px;font-weight:500;color:var(--text-mid);line-height:1.6;margin-bottom:14px}
+  .exam-features{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+  .exam-feat{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text-mid)}
+  .exam-feat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+  .btn-exam{
+    width:100%;padding:11px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;
+    border:2px solid var(--border);background:var(--surface);color:var(--text-dark);
+    cursor:pointer;transition:all .2s;
+  }
+  .btn-exam:hover{border-color:var(--primary);color:var(--primary)}
+
+  /* ════════════════════════════════════════
+     HOW IT WORKS
+  ════════════════════════════════════════ */
+  .how-section{background:var(--surface)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative}
+  .steps::before{
+    content:'';position:absolute;top:36px;left:calc(12.5% + 8px);right:calc(12.5% + 8px);
+    height:2px;background:linear-gradient(90deg,var(--primary),var(--accent));
+    border-radius:2px;z-index:0;
+  }
+  .step{text-align:center;position:relative;z-index:1}
+  .step-num{
+    width:72px;height:72px;border-radius:50%;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;color:#fff;
+    margin:0 auto 18px;
+    box-shadow:0 6px 20px rgba(255,107,53,.4);
+  }
+  .step-icon{font-size:28px;margin-bottom:2px}
+  .step-title{font-family:'Baloo 2',cursive;font-size:17px;font-weight:800;color:var(--text-dark);margin-bottom:8px}
+  .step-desc{font-size:13.5px;font-weight:500;color:var(--text-mid);line-height:1.6}
+
+  /* ════════════════════════════════════════
+     PRICING
+  ════════════════════════════════════════ */
+  .pricing-section{background:var(--bg);position:relative;overflow:hidden}
+  .pricing-section::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,107,53,.06) 0%, transparent 60%);
+  }
+  .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:780px;margin:0 auto;position:relative;z-index:1}
+  .pricing-card{
+    background:var(--surface);border-radius:var(--radius);
+    border:2px solid var(--border);padding:32px;
+    transition:all .25s;position:relative;overflow:hidden;
+  }
+  .pricing-card.popular{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(255,107,53,.1), var(--shadow-lg);
+  }
+  .popular-tag{
+    position:absolute;top:18px;right:18px;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    color:#fff;font-size:11px;font-weight:800;
+    padding:4px 12px;border-radius:50px;
+  }
+  .plan-name{font-family:'Baloo 2',cursive;font-size:22px;font-weight:800;color:var(--text-dark);margin-bottom:6px}
+  .plan-price{
+    font-family:'Baloo 2',cursive;font-size:42px;font-weight:800;
+    color:var(--primary);line-height:1;margin-bottom:4px;
+  }
+  .plan-price sup{font-size:20px;vertical-align:super;margin-right:2px}
+  .plan-price .period{font-size:16px;color:var(--text-light);font-family:'Nunito',sans-serif;font-weight:600}
+  .plan-free{font-family:'Baloo 2',cursive;font-size:36px;font-weight:800;color:var(--text-mid);line-height:1;margin-bottom:4px}
+  .plan-desc{font-size:14px;font-weight:500;color:var(--text-mid);margin-bottom:24px;line-height:1.5}
+  .plan-divider{height:1px;background:var(--border);margin-bottom:20px}
+  .plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+  .plan-feat{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text-mid)}
+  .feat-check{color:var(--green);font-size:16px;flex-shrink:0}
+  .feat-x{color:var(--text-light);font-size:16px;flex-shrink:0}
+  .btn-plan-free{
+    width:100%;padding:13px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;
+    background:var(--bg);border:2px solid var(--border);color:var(--text-mid);cursor:pointer;transition:all .2s;
+  }
+  .btn-plan-free:hover{border-color:var(--primary);color:var(--primary)}
+  .btn-plan-premium{
+    width:100%;padding:13px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,var(--primary),var(--primary-light));
+    border:none;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,.38);transition:all .2s;
+  }
+  .btn-plan-premium:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(255,107,53,.5)}
+
+  /* ════════════════════════════════════════
+     TESTIMONIALS
+  ════════════════════════════════════════ */
+  .testi-section{background:var(--surface)}
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .testi-card{
+    background:var(--bg);border-radius:var(--radius);
+    border:1.5px solid var(--border);padding:24px;
+    transition:all .2s;
+  }
+  .testi-card:hover{border-color:var(--primary);box-shadow:var(--shadow-sm)}
+  .testi-stars{display:flex;gap:3px;margin-bottom:12px}
+  .testi-star{color:var(--accent);font-size:14px}
+  .testi-text{font-size:14px;font-weight:600;color:var(--text-mid);line-height:1.7;margin-bottom:16px}
+  .testi-author{display:flex;align-items:center;gap:10px}
+  .testi-avatar{
+    width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;flex-shrink:0;
+  }
+  .testi-name{font-size:14px;font-weight:800;color:var(--text-dark)}
+  .testi-role{font-size:12px;font-weight:600;color:var(--text-light);margin-top:1px}
+  .testi-result{
+    font-size:11.5px;font-weight:800;
+    background:rgba(107,203,119,.12);color:var(--green);
+    padding:3px 10px;border-radius:50px;
+    display:inline-block;margin-top:5px;
+    border:1px solid rgba(107,203,119,.25);
+  }
+
+  /* ════════════════════════════════════════
+     FINAL CTA
+  ════════════════════════════════════════ */
+  .cta-section{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 50%,var(--accent) 100%);
+    position:relative;overflow:hidden;padding:96px 0;
+  }
+  .cta-section::before{
+    content:'';position:absolute;inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ffffff' stroke-opacity='.05' stroke-width='1'/%3E%3C/svg%3E");
+    background-size:100px 100px;
+  }
+  .cta-inner{text-align:center;position:relative;z-index:1;max-width:600px;margin:0 auto;padding:0 24px}
+  .cta-emoji{font-size:52px;display:block;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+  .cta-title{font-family:'Baloo 2',cursive;font-size:clamp(28px,4vw,44px);font-weight:800;color:#fff;line-height:1.15;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,.12)}
+  .cta-desc{font-size:17px;font-weight:600;color:rgba(255,255,255,.88);margin-bottom:32px;line-height:1.6}
+  .cta-buttons{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+  .btn-cta-white{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:15px 32px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;
+    color:var(--primary);background:#fff;
+    box-shadow:0 6px 24px rgba(0,0,0,.15);
+    text-decoration:none;border:none;cursor:pointer;transition:all .2s;
+  }
+  .btn-cta-white:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,0,0,.2)}
+  .btn-cta-outline{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:15px 28px;border-radius:var(--radius-sm);
+    font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;
+    color:#fff;background:rgba(255,255,255,.15);
+    border:2px solid rgba(255,255,255,.4);
+    text-decoration:none;cursor:pointer;transition:all .2s;
+  }
+  .btn-cta-outline:hover{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.7)}
+  .cta-note{margin-top:16px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7)}
+
+  /* ════════════════════════════════════════
+     FOOTER
+  ════════════════════════════════════════ */
+  .footer{background:var(--text-dark);padding:64px 0 32px}
+  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+  .footer-brand .nav-logo{margin-bottom:14px;display:inline-flex}
+  .footer-brand .nav-logo-text{color:#fff}
+  .footer-tagline{font-size:14px;font-weight:500;color:rgba(255,255,255,.5);line-height:1.65;margin-bottom:20px;max-width:260px}
+  .footer-social{display:flex;gap:10px}
+  .social-btn{
+    width:36px;height:36px;border-radius:10px;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,.5);text-decoration:none;font-size:15px;
+    transition:all .2s;
+  }
+  .social-btn:hover{background:var(--primary);border-color:var(--primary);color:#fff}
+  .footer-col-title{font-size:12px;font-weight:800;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+  .footer-links{display:flex;flex-direction:column;gap:10px}
+  .footer-link{font-size:14px;font-weight:600;color:rgba(255,255,255,.55);text-decoration:none;transition:color .18s}
+  .footer-link:hover{color:#fff}
+  .footer-bottom{
+    border-top:1px solid rgba(255,255,255,.08);padding-top:24px;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  }
+  .footer-copy{font-size:13px;font-weight:600;color:rgba(255,255,255,.35)}
+  .footer-bottom-links{display:flex;gap:20px}
+  .footer-bottom-link{font-size:13px;font-weight:600;color:rgba(255,255,255,.35);text-decoration:none;transition:color .18s}
+  .footer-bottom-link:hover{color:rgba(255,255,255,.8)}
+
+  /* ── Responsive ── */
+  @media(max-width:960px){
+    .hero-inner{grid-template-columns:1fr;gap:48px;text-align:center}
+    .hero-left .hero-cta,.hero-social-proof{justify-content:center}
+    .hero-right{display:none}
+    .skills-grid{grid-template-columns:repeat(2,1fr)}
+    .ai-inner,.game-inner{grid-template-columns:1fr;gap:48px}
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .steps::before{display:none}
+    .exam-cards{grid-template-columns:1fr}
+    .pricing-grid{grid-template-columns:1fr;max-width:420px}
+    .testi-grid{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .stat-item{border-bottom:1px solid rgba(255,255,255,.15);border-right:none;padding:20px 0}
+    .stat-item:nth-child(1),.stat-item:nth-child(2){border-right:1px solid rgba(255,255,255,.15)}
+  }
+  @media(max-width:600px){
+    .nav-links,.nav-link{display:none}
+    .skills-grid{grid-template-columns:1fr}
+    .game-grid{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr}
+  }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     NAVBAR
+════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">🌟</div>
+      <div class="nav-logo-text">English<span>Master</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="#skills"  class="nav-link">Kỹ năng</a>
+      <a href="#ai"      class="nav-link">Tính năng AI</a>
+      <a href="#exam"    class="nav-link">Luyện đề</a>
+      <a href="#pricing" class="nav-link">Bảng giá</a>
+      <a href="#community" class="nav-link">Cộng đồng</a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-actions">
+      <a href="/login"    class="btn-ghost">Đăng nhập</a>
+      <a href="/register" class="btn-primary">Đăng ký miễn phí 🚀</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════
+     HERO
+════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+
+  <div class="hero-inner container">
+    <!-- Left -->
+    <div class="hero-left">
+      <div class="tag hero-tag">🤖 AI-Powered · Gamification · Personalized</div>
+      <h1 class="hero-title">
+        Học Tiếng Anh<br/>
+        <span class="line2">Thông Minh Hơn,</span><br/>
+        <span class="line3">Nhanh Hơn, Vui Hơn</span>
+      </h1>
+      <p class="hero-desc">
+        Nền tảng học tiếng Anh cá nhân hóa với AI – tự động xác định trình độ,
+        tạo lộ trình riêng và biến việc học thành một trò chơi thú vị mỗi ngày.
+      </p>
+      <div class="hero-cta">
+        <a href="/register" class="btn-hero-primary">
+          Bắt đầu miễn phí
+          <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="/placement-test" class="btn-hero-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Kiểm tra trình độ
+        </a>
+      </div>
+      <div class="hero-social-proof">
+        <div class="avatar-stack">
+          <div class="avatar-item" style="background:linear-gradient(135deg,#FF6B35,#FF9966)">N</div>
+          <div class="avatar-item" style="background:linear-gradient(135deg,#4ECDC4,#6BCB77)">T</div>
+          <div class="avatar-item" style="background:linear-gradient(135deg,#A78BFA,#8B5CF6)">L</div>
+          <div class="avatar-item" style="background:linear-gradient(135deg,#FFD93D,#FF9966)">M</div>
+          <div class="avatar-item" style="background:linear-gradient(135deg,#1E1B4B,#4338CA)">+</div>
+        </div>
+        <span class="social-text"><strong>50,000+</strong> học viên đang học</span>
+        <div class="star-row">
+          <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          <span class="star-label">&nbsp;4.9/5</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right – app mockup -->
+    <div class="hero-right">
+      <div class="hero-phone">
+        <!-- Floating badges -->
+        <div class="float-badge fb-streak">
+          <div class="badge-icon">🔥</div>
+          <div>
+            <div class="badge-val">30</div>
+            <div class="badge-sub">Ngày streak</div>
+          </div>
+        </div>
+        <div class="float-badge fb-badge">
+          <div class="badge-icon">🏅</div>
+          <div>
+            <div class="badge-val">Badge mới!</div>
+            <div class="badge-sub">Speaking Star</div>
+          </div>
+        </div>
+        <div class="float-badge fb-rank">
+          <div class="badge-icon">🏆</div>
+          <div>
+            <div class="badge-val">#3</div>
+            <div class="badge-sub">Bảng xếp hạng</div>
+          </div>
+        </div>
+
+        <div class="app-mockup">
+          <!-- Topbar -->
+          <div class="mockup-topbar">
+            <div class="mockup-logo">🌟 EnglishMaster</div>
+            <div class="mockup-streak">🔥 30 ngày</div>
+          </div>
+          <!-- Body -->
+          <div class="mockup-body">
+            <div class="mockup-greeting">Chào buổi sáng, <span>Minh!</span> ☀️</div>
+            <!-- Progress card -->
+            <div class="mockup-progress-card">
+              <div class="mpc-label">Bài học hôm nay</div>
+              <div class="mpc-title">Unit 4 – Present Perfect Tense</div>
+              <div class="mpc-bar"><div class="mpc-fill"></div></div>
+              <div class="mpc-meta"><span>12/20 bài tập</span><span>62% hoàn thành</span></div>
+            </div>
+            <!-- Skill chips -->
+            <div class="mockup-skills">
+              <div class="skill-chip">
+                <div class="skill-chip-ico">📖</div>
+                <div>
+                  <div class="skill-chip-name">Từ vựng</div>
+                  <div class="skill-chip-sub">850 từ đã học</div>
+                </div>
+              </div>
+              <div class="skill-chip">
+                <div class="skill-chip-ico">🗣️</div>
+                <div>
+                  <div class="skill-chip-name">Phát âm</div>
+                  <div class="skill-chip-sub">Điểm: 92/100</div>
+                </div>
+              </div>
+              <div class="skill-chip">
+                <div class="skill-chip-ico">👂</div>
+                <div>
+                  <div class="skill-chip-name">Nghe</div>
+                  <div class="skill-chip-sub">B2 level</div>
+                </div>
+              </div>
+              <div class="skill-chip">
+                <div class="skill-chip-ico">✍️</div>
+                <div>
+                  <div class="skill-chip-name">Writing</div>
+                  <div class="skill-chip-sub">AI chấm bài</div>
+                </div>
+              </div>
+            </div>
+            <!-- XP -->
+            <div class="mockup-xp">
+              <div class="xp-icon">⚡</div>
+              <div style="flex:1">
+                <div class="xp-label">ĐIỂM KINH NGHIỆM</div>
+                <div class="xp-bar"><div class="xp-fill"></div></div>
+              </div>
+              <div class="xp-val">1,240 XP</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     STATS BAND
+════════════════════════════════════════ -->
+<div class="stats-band">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">50,000+</div>
+        <div class="stat-label">Học viên đang học</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1,200+</div>
+        <div class="stat-label">Bài học được thiết kế</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">98%</div>
+        <div class="stat-label">Học viên hài lòng</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4.9 ⭐</div>
+        <div class="stat-label">Đánh giá trung bình</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     6 SKILLS
+════════════════════════════════════════ -->
+<section class="section" id="skills">
+  <div class="container">
+    <div class="section-header anim-fade-up">
+      <div class="tag" style="background:rgba(255,107,53,.1);color:var(--primary)">📚 6 Kỹ Năng Toàn Diện</div>
+      <h2 class="section-title">Thành thạo tiếng Anh với<br/><span>đầy đủ 6 kỹ năng</span></h2>
+      <p class="section-desc">Mỗi kỹ năng được thiết kế bởi các chuyên gia ngôn ngữ, kết hợp AI để cá nhân hóa lộ trình cho từng người học.</p>
+    </div>
+
+    <div class="skills-grid anim-fade-up">
+      <!-- Vocabulary -->
+      <div class="skill-card" style="--hover-color:var(--primary)">
+        <style>.skill-card:nth-child(1)::before{background:linear-gradient(90deg,var(--primary),var(--primary-light))}</style>
+        <div class="skill-card-icon" style="background:rgba(255,107,53,.1)">📖</div>
+        <div class="skill-card-title">Từ Vựng</div>
+        <div class="skill-card-desc">Học từ theo chủ đề, spaced repetition thông minh. Flashcard tương tác với hình ảnh và audio chuẩn.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">Flashcard</span>
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">Spaced Repetition</span>
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">1000+ chủ đề</span>
+        </div>
+      </div>
+      <!-- Grammar -->
+      <div class="skill-card">
+        <style>.skill-card:nth-child(2)::before{background:linear-gradient(90deg,#4ECDC4,#6BCB77)}</style>
+        <div class="skill-card-icon" style="background:rgba(78,205,196,.1)">🔤</div>
+        <div class="skill-card-title">Ngữ Pháp</div>
+        <div class="skill-card-desc">Bài học lý thuyết rõ ràng kết hợp bài tập tương tác. Giải thích chi tiết sau mỗi câu đúng/sai.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(78,205,196,.12);color:#0E9F9F">Lý thuyết</span>
+          <span class="skill-feat" style="background:rgba(78,205,196,.12);color:#0E9F9F">Bài tập tương tác</span>
+          <span class="skill-feat" style="background:rgba(78,205,196,.12);color:#0E9F9F">A1 → C1</span>
+        </div>
+      </div>
+      <!-- Listening -->
+      <div class="skill-card">
+        <style>.skill-card:nth-child(3)::before{background:linear-gradient(90deg,#A78BFA,#8B5CF6)}</style>
+        <div class="skill-card-icon" style="background:rgba(167,139,250,.12)">👂</div>
+        <div class="skill-card-title">Nghe Hiểu</div>
+        <div class="skill-card-desc">Audio chuẩn native speaker, điều chỉnh tốc độ 0.75x–1.5x. Bài tập fill-in-the-blank và transcript.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(167,139,250,.15);color:#7C3AED">0.75x–1.5x</span>
+          <span class="skill-feat" style="background:rgba(167,139,250,.15);color:#7C3AED">Transcript</span>
+          <span class="skill-feat" style="background:rgba(167,139,250,.15);color:#7C3AED">Native Audio</span>
+        </div>
+      </div>
+      <!-- Speaking -->
+      <div class="skill-card">
+        <style>.skill-card:nth-child(4)::before{background:linear-gradient(90deg,#FF6B35,#A78BFA)}</style>
+        <div class="skill-card-icon" style="background:rgba(255,107,53,.08)">🗣️</div>
+        <div class="skill-card-title">Nói & Phát Âm</div>
+        <div class="skill-card-desc">AI nhận dạng giọng nói, chấm điểm phát âm từng âm tiết. So sánh với giọng chuẩn và gợi ý cải thiện.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">AI Scoring</span>
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">Waveform</span>
+          <span class="skill-feat" style="background:rgba(255,107,53,.1);color:var(--primary)">Real-time</span>
+        </div>
+      </div>
+      <!-- Writing -->
+      <div class="skill-card">
+        <style>.skill-card:nth-child(5)::before{background:linear-gradient(90deg,#6BCB77,#4ECDC4)}</style>
+        <div class="skill-card-icon" style="background:rgba(107,203,119,.12)">✍️</div>
+        <div class="skill-card-title">Viết</div>
+        <div class="skill-card-desc">AI chấm bài theo 4 tiêu chí: ngữ pháp, từ vựng, mạch văn, nhiệm vụ. Phản hồi chi tiết từng lỗi.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(107,203,119,.12);color:#2E8B3A">AI Grading</span>
+          <span class="skill-feat" style="background:rgba(107,203,119,.12);color:#2E8B3A">Error Highlight</span>
+          <span class="skill-feat" style="background:rgba(107,203,119,.12);color:#2E8B3A">IELTS Task</span>
+        </div>
+      </div>
+      <!-- Reading -->
+      <div class="skill-card">
+        <style>.skill-card:nth-child(6)::before{background:linear-gradient(90deg,#FFD93D,#FF9966)}</style>
+        <div class="skill-card-icon" style="background:rgba(255,217,61,.15)">📝</div>
+        <div class="skill-card-title">Đọc Hiểu</div>
+        <div class="skill-card-desc">Đoạn văn đa cấp độ, click từ tra nghĩa ngay, highlight từ mới lưu vào từ điển cá nhân.</div>
+        <div class="skill-card-features">
+          <span class="skill-feat" style="background:rgba(255,217,61,.18);color:#B45309">Mini Dict</span>
+          <span class="skill-feat" style="background:rgba(255,217,61,.18);color:#B45309">Highlight</span>
+          <span class="skill-feat" style="background:rgba(255,217,61,.18);color:#B45309">A1 → C1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     AI FEATURES
+════════════════════════════════════════ -->
+<section class="section ai-section" id="ai">
+  <div class="container">
+    <div class="ai-inner">
+      <!-- Left text -->
+      <div class="ai-left anim-fade-up">
+        <div class="tag" style="background:rgba(167,139,250,.18);color:#c4b5fd">🤖 Powered by Gemini AI</div>
+        <h2 class="section-title" style="color:#fff;text-align:left;margin-bottom:12px">Trợ lý AI cá nhân<br/><span style="color:var(--accent)">học cùng bạn 24/7</span></h2>
+        <p class="section-desc" style="text-align:left;margin:0 0 36px;color:rgba(255,255,255,.6)">
+          Không chỉ là bài học tĩnh — AI phân tích điểm yếu, gợi ý bài phù hợp và trò chuyện thực tế để bạn tự tin hơn mỗi ngày.
+        </p>
+        <div class="ai-cards">
+          <div class="ai-card">
+            <div class="ai-card-icon" style="background:rgba(167,139,250,.2)">🗨️</div>
+            <div>
+              <div class="ai-card-title">AI Chatbot luyện hội thoại</div>
+              <div class="ai-card-desc">Mô phỏng 10+ tình huống thực tế: đặt phòng, phỏng vấn, mua sắm. AI sửa lỗi nhẹ nhàng trong lúc chat.</div>
+            </div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-icon" style="background:rgba(107,203,119,.18)">🎯</div>
+            <div>
+              <div class="ai-card-title">Chấm điểm phát âm thông minh</div>
+              <div class="ai-card-desc">So sánh giọng người học với native speaker theo từng âm vị. Điểm số 0–100 + gợi ý cải thiện cụ thể.</div>
+            </div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-icon" style="background:rgba(255,217,61,.18)">✏️</div>
+            <div>
+              <div class="ai-card-title">AI Writing Checker</div>
+              <div class="ai-card-desc">Phân tích bài viết theo 4 tiêu chí IELTS. Highlight lỗi, giải thích nguyên nhân và đề xuất sửa.</div>
+            </div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-icon" style="background:rgba(255,107,53,.18)">🧭</div>
+            <div>
+              <div class="ai-card-title">Gợi ý học cá nhân hóa</div>
+              <div class="ai-card-desc">AI nhận diện điểm yếu dựa trên lịch sử làm bài và đề xuất 3–5 bài ưu tiên mỗi ngày.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Right – chat demo -->
+      <div class="anim-fade-up">
+        <div class="chat-demo">
+          <div class="chat-topbar">
+            <div class="chat-avatar">🤖</div>
+            <div>
+              <div class="chat-name">AI English Coach</div>
+              <div class="chat-status">● Đang hoạt động</div>
+            </div>
+            <div class="chat-scenario">🏨 Đặt phòng khách sạn</div>
+          </div>
+          <div class="chat-body">
+            <div class="msg ai">
+              <div class="msg-bubble">Hello! I'm Alex, the front desk manager. How can I help you today?</div>
+            </div>
+            <div class="msg user">
+              <div>
+                <div class="msg-bubble">I want to <span style="text-decoration:underline;text-decoration-color:#fca;text-decoration-style:wavy">reservate</span> a room for 3 nights.</div>
+                <div class="msg-error">💡 "reservate" → "reserve" hoặc "make a reservation"</div>
+              </div>
+            </div>
+            <div class="msg ai">
+              <div class="msg-bubble">Of course! What type of room would you prefer — single, double, or a suite?</div>
+            </div>
+            <div class="msg user">
+              <div class="msg-bubble">A double room please. Do you have ocean view?</div>
+            </div>
+            <div class="msg ai">
+              <div class="msg-bubble">Great choice! We have ocean-view double rooms available. Check-in date? 🌊</div>
+            </div>
+          </div>
+          <div class="chat-input-bar">
+            <div class="chat-input">Nhập câu trả lời của bạn…</div>
+            <button class="chat-send">➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════ -->
+<section class="section how-section">
+  <div class="container">
+    <div class="section-header anim-fade-up">
+      <div class="tag" style="background:rgba(78,205,196,.1);color:#0E9F9F">🗺️ Quy Trình 4 Bước</div>
+      <h2 class="section-title">Bắt đầu học chỉ với<br/><span>4 bước đơn giản</span></h2>
+      <p class="section-desc">Từ đăng ký đến học bài đầu tiên chỉ mất chưa đầy 5 phút.</p>
+    </div>
+    <div class="steps anim-fade-up">
+      <div class="step">
+        <div class="step-num"><div class="step-icon">📝</div></div>
+        <div class="step-title">Đăng ký miễn phí</div>
+        <div class="step-desc">Tạo tài khoản bằng email, Google hoặc Facebook chỉ trong 30 giây.</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><div class="step-icon">📋</div></div>
+        <div class="step-title">Kiểm tra trình độ</div>
+        <div class="step-desc">Làm bài test 40 câu để AI xác định chính xác level từ A1 đến C1.</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><div class="step-icon">🗺️</div></div>
+        <div class="step-title">Nhận lộ trình riêng</div>
+        <div class="step-desc">AI tạo lộ trình cá nhân hóa theo trình độ, mục tiêu và thời gian học của bạn.</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><div class="step-icon">🚀</div></div>
+        <div class="step-title">Học & Tiến bộ mỗi ngày</div>
+        <div class="step-desc">Học bài, tích XP, duy trì streak và leo hạng trên bảng xếp hạng cộng đồng.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     GAMIFICATION
+════════════════════════════════════════ -->
+<section class="section game-section">
+  <div class="container">
+    <div class="game-inner">
+      <!-- Left -->
+      <div class="anim-fade-up">
+        <div class="tag" style="background:rgba(255,217,61,.15);color:#B45309">🎮 Game Hóa Việc Học</div>
+        <h2 class="section-title" style="text-align:left;margin-bottom:12px">Học vui như<br/><span>chơi game</span></h2>
+        <p class="section-desc" style="text-align:left;margin:0 0 32px">Hệ thống gamification đầy đủ giúp bạn duy trì động lực học mỗi ngày mà không cảm thấy nhàm chán.</p>
+        <div class="game-grid">
+          <div class="game-card">
+            <div class="game-card-icon">⚡</div>
+            <div class="game-card-title">XP & Level</div>
+            <div class="game-card-desc">Tích điểm sau mỗi bài học, level up từ Beginner lên Master.</div>
+          </div>
+          <div class="game-card">
+            <div class="game-card-icon">🔥</div>
+            <div class="game-card-title">Streak</div>
+            <div class="game-card-desc">Duy trì chuỗi ngày học liên tiếp. Phần thưởng đặc biệt mỗi milestone.</div>
+          </div>
+          <div class="game-card">
+            <div class="game-card-icon">🏅</div>
+            <div class="game-card-title">Huy Hiệu</div>
+            <div class="game-card-desc">Mở khóa 50+ badge khi đạt thành tích. Hiển thị trên profile.</div>
+          </div>
+          <div class="game-card">
+            <div class="game-card-icon">🛍️</div>
+            <div class="game-card-title">Cửa Hàng XP</div>
+            <div class="game-card-desc">Dùng XP mua avatar, theme giao diện và tăng cường học tập.</div>
+          </div>
+        </div>
+      </div>
+      <!-- Right – leaderboard -->
+      <div class="anim-fade-up">
+        <div class="leaderboard-card">
+          <div class="lb-header">
+            <div>🏆</div>
+            <div class="lb-title">Bảng Xếp Hạng</div>
+            <div class="lb-period">Tuần này</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank" style="background:linear-gradient(135deg,#FFD93D,#FF9966);color:#fff">🥇</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#FF6B35,#FF9966)">N</div>
+            <div class="lb-name">Nguyễn Minh Tuấn</div>
+            <div class="lb-xp">3,840 XP</div>
+            <div class="lb-badge">🔥</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank" style="background:linear-gradient(135deg,#9CA3AF,#D1D5DB);color:#fff">🥈</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#4ECDC4,#6BCB77)">T</div>
+            <div class="lb-name">Trần Thị Lan Anh</div>
+            <div class="lb-xp">3,210 XP</div>
+            <div class="lb-badge">⭐</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank" style="background:linear-gradient(135deg,#CD7F32,#D97706);color:#fff">🥉</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#A78BFA,#8B5CF6)">L</div>
+            <div class="lb-name">Lê Hoàng Nam</div>
+            <div class="lb-xp">2,950 XP</div>
+            <div class="lb-badge">🏅</div>
+          </div>
+          <div class="lb-row" style="background:rgba(255,107,53,.04);">
+            <div class="lb-rank" style="background:rgba(255,107,53,.1);color:var(--primary)">12</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#FFD93D,#FF9966)">B</div>
+            <div class="lb-name" style="color:var(--primary);font-weight:800">Bạn (Bảo)</div>
+            <div class="lb-xp">1,240 XP</div>
+            <div class="lb-badge">🔥</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank" style="background:rgba(156,163,175,.12);color:var(--text-light)">13</div>
+            <div class="lb-avatar" style="background:linear-gradient(135deg,#6BCB77,#4ECDC4)">H</div>
+            <div class="lb-name">Hồ Thị Mai</div>
+            <div class="lb-xp">1,190 XP</div>
+            <div class="lb-badge"></div>
+          </div>
+          <div style="padding:12px 20px;text-align:center">
+            <a href="/leaderboard" style="font-size:13px;font-weight:700;color:var(--primary);text-decoration:none">Xem bảng xếp hạng đầy đủ →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     EXAM PREP
+════════════════════════════════════════ -->
+<section class="section exam-section" id="exam">
+  <div class="container">
+    <div class="section-header anim-fade-up">
+      <div class="tag" style="background:rgba(167,139,250,.12);color:#7C3AED">🎓 Luyện Thi Chứng Chỉ</div>
+      <h2 class="section-title">Chinh phục <span>IELTS · TOEIC · TOEFL</span><br/>với giao diện thi thật</h2>
+      <p class="section-desc">Đề thi mô phỏng chuẩn xác, chấm điểm AI tức thì và phân tích điểm mạnh/yếu chi tiết sau mỗi lần thi.</p>
+    </div>
+    <div class="exam-cards anim-fade-up">
+      <!-- IELTS -->
+      <div class="exam-card">
+        <div class="exam-card-header" style="background:linear-gradient(135deg,#4ECDC4,#6BCB77)">
+          <div class="exam-card-title-big">IELTS</div>
+        </div>
+        <div class="exam-card-body">
+          <div class="exam-card-name">IELTS Academic & General</div>
+          <div class="exam-card-desc">Luyện đề chuẩn British Council với 4 sections đầy đủ. AI chấm Writing và Speaking.</div>
+          <div class="exam-features">
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#4ECDC4"></div>Listening, Reading, Writing, Speaking</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#4ECDC4"></div>Band score 0–9 ước tính</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#4ECDC4"></div>50+ full mock tests</div>
+          </div>
+          <button class="btn-exam">Luyện IELTS →</button>
+        </div>
+      </div>
+      <!-- TOEIC -->
+      <div class="exam-card">
+        <div class="exam-card-header" style="background:linear-gradient(135deg,#FF6B35,#FF9966)">
+          <div class="exam-card-title-big">TOEIC</div>
+        </div>
+        <div class="exam-card-body">
+          <div class="exam-card-name">TOEIC Listening & Reading</div>
+          <div class="exam-card-desc">Format chuẩn ETS, 200 câu / 120 phút. Điểm scaled score 10–990. Phân tích Part 5,6,7 chi tiết.</div>
+          <div class="exam-features">
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:var(--primary)"></div>Part 1–7 đầy đủ</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:var(--primary)"></div>Scaled score conversion</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:var(--primary)"></div>40+ full mock tests</div>
+          </div>
+          <button class="btn-exam">Luyện TOEIC →</button>
+        </div>
+      </div>
+      <!-- TOEFL -->
+      <div class="exam-card">
+        <div class="exam-card-header" style="background:linear-gradient(135deg,#A78BFA,#8B5CF6)">
+          <div class="exam-card-title-big">TOEFL</div>
+        </div>
+        <div class="exam-card-body">
+          <div class="exam-card-name">TOEFL iBT</div>
+          <div class="exam-card-desc">Luyện Reading & Listening theo format TOEFL iBT. Điểm số 0–120. Phù hợp du học Mỹ, Canada.</div>
+          <div class="exam-features">
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#A78BFA"></div>Reading + Listening</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#A78BFA"></div>Score 0–120</div>
+            <div class="exam-feat"><div class="exam-feat-dot" style="background:#A78BFA"></div>20+ mock tests</div>
+          </div>
+          <button class="btn-exam">Luyện TOEFL →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     PRICING
+════════════════════════════════════════ -->
+<section class="section pricing-section" id="pricing">
+  <div class="container">
+    <div class="section-header anim-fade-up">
+      <div class="tag" style="background:rgba(107,203,119,.12);color:#2E8B3A">💎 Bảng Giá</div>
+      <h2 class="section-title">Miễn phí để bắt đầu,<br/><span>Premium để bứt phá</span></h2>
+      <p class="section-desc">Tất cả tính năng cơ bản hoàn toàn miễn phí. Nâng cấp Premium để mở khóa AI không giới hạn và luyện đề đầy đủ.</p>
+    </div>
+    <div class="pricing-grid anim-fade-up">
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-free">0₫</div>
+        <div class="plan-desc">Bắt đầu hành trình học tiếng Anh hoàn toàn miễn phí</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="feat-check">✓</span>Bài học cơ bản tất cả kỹ năng</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Placement Test xác định trình độ</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Flashcard & Spaced Repetition</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Gamification (XP, Streak, Badge)</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Cộng đồng & Forum</div>
+          <div class="plan-feat"><span class="feat-x">✗</span><span style="color:var(--text-light)">AI Chat luyện nói</span></div>
+          <div class="plan-feat"><span class="feat-x">✗</span><span style="color:var(--text-light)">Luyện đề IELTS/TOEIC đầy đủ</span></div>
+          <div class="plan-feat"><span class="feat-x">✗</span><span style="color:var(--text-light)">Tải bài học offline</span></div>
+        </div>
+        <button class="btn-plan-free" onclick="location.href='/register'">Đăng ký miễn phí</button>
+      </div>
+      <!-- Premium -->
+      <div class="pricing-card popular">
+        <div class="popular-tag">Phổ biến nhất 🔥</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-price"><sup>₫</sup>99,000<span class="period">/tháng</span></div>
+        <div class="plan-desc">Mở khóa toàn bộ tính năng AI và luyện đề không giới hạn</div>
+        <div class="plan-divider"></div>
+        <div class="plan-features">
+          <div class="plan-feat"><span class="feat-check">✓</span>Tất cả tính năng Free</div>
+          <div class="plan-feat"><span class="feat-check">✓</span><strong>AI Chat luyện hội thoại</strong></div>
+          <div class="plan-feat"><span class="feat-check">✓</span><strong>AI Writing Checker không giới hạn</strong></div>
+          <div class="plan-feat"><span class="feat-check">✓</span><strong>Luyện đề IELTS/TOEIC/TOEFL đầy đủ</strong></div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Tải bài học offline</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Báo cáo học tập chi tiết</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Không quảng cáo</div>
+          <div class="plan-feat"><span class="feat-check">✓</span>Streak Shield (3 lần/tháng)</div>
+        </div>
+        <button class="btn-plan-premium" onclick="location.href='/register'">Dùng thử 7 ngày miễn phí →</button>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:20px;font-size:13px;font-weight:600;color:var(--text-light);position:relative;z-index:1">
+      💳 Thanh toán qua VNPay, MoMo, thẻ tín dụng · Hủy bất kỳ lúc nào
+    </p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════ -->
+<section class="section testi-section" id="community">
+  <div class="container">
+    <div class="section-header anim-fade-up">
+      <div class="tag" style="background:rgba(255,107,53,.1);color:var(--primary)">💬 Học Viên Nói Gì</div>
+      <h2 class="section-title">Hàng nghìn người đã<br/><span>thay đổi nhờ EnglishMaster</span></h2>
+    </div>
+    <div class="testi-grid anim-fade-up">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Sau 3 tháng dùng EnglishMaster, tôi đã nâng điểm IELTS từ 5.5 lên 7.0. Tính năng AI Chat và Writing Checker cực kỳ hữu ích!"</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#FF6B35,#FF9966)">N</div>
+          <div>
+            <div class="testi-name">Nguyễn Thị Hương</div>
+            <div class="testi-role">Sinh viên Y khoa, Hà Nội</div>
+            <div class="testi-result">IELTS: 5.5 → 7.0 🎯</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Tôi đã thử nhiều app học tiếng Anh nhưng EnglishMaster là cái duy nhất tôi dùng được 6 tháng liên tục. Streak 180 ngày rồi!"</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#4ECDC4,#6BCB77)">T</div>
+          <div>
+            <div class="testi-name">Trần Minh Khoa</div>
+            <div class="testi-role">Kỹ sư phần mềm, TP.HCM</div>
+            <div class="testi-result">Streak 180 ngày 🔥</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-text">"Con tôi 12 tuổi học rất thích vì có game hóa. Điểm thi Anh văn trường tăng từ 6 lên 9 chỉ sau 2 học kỳ học EnglishMaster."</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#A78BFA,#8B5CF6)">L</div>
+          <div>
+            <div class="testi-name">Lê Thị Thu Hà</div>
+            <div class="testi-role">Phụ huynh học sinh, Đà Nẵng</div>
+            <div class="testi-result">Điểm Anh văn: 6 → 9 ⭐</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FINAL CTA
+════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <span class="cta-emoji">🚀</span>
+    <h2 class="cta-title">Sẵn sàng nâng cấp<br/>tiếng Anh của bạn?</h2>
+    <p class="cta-desc">Tham gia cùng 50,000+ học viên đang học mỗi ngày. Miễn phí để bắt đầu — không cần thẻ tín dụng.</p>
+    <div class="cta-buttons">
+      <a href="/register" class="btn-cta-white">
+        🌟 Đăng ký miễn phí ngay
+      </a>
+      <a href="/placement-test" class="btn-cta-outline">
+        📋 Kiểm tra trình độ
+      </a>
+    </div>
+    <p class="cta-note">✓ Miễn phí hoàn toàn &nbsp;·&nbsp; ✓ Không cần thẻ &nbsp;·&nbsp; ✓ Hủy bất kỳ lúc nào</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand -->
+      <div class="footer-brand">
+        <a href="/" class="nav-logo">
+          <div class="nav-logo-icon">🌟</div>
+          <div class="nav-logo-text">English<span>Master</span></div>
+        </a>
+        <p class="footer-tagline">Nền tảng học tiếng Anh thông minh, cá nhân hóa theo từng người học, kết hợp AI và gamification.</p>
+        <div class="footer-social">
+          <a href="#" class="social-btn">f</a>
+          <a href="#" class="social-btn" style="font-size:12px">in</a>
+          <a href="#" class="social-btn" style="font-size:11px">yt</a>
+          <a href="#" class="social-btn" style="font-size:11px">tg</a>
+        </div>
+      </div>
+      <!-- Product -->
+      <div>
+        <div class="footer-col-title">Sản phẩm</div>
+        <div class="footer-links">
+          <a href="#skills" class="footer-link">6 Kỹ năng học</a>
+          <a href="#ai" class="footer-link">Tính năng AI</a>
+          <a href="#exam" class="footer-link">Luyện đề IELTS/TOEIC</a>
+          <a href="#" class="footer-link">Gamification</a>
+          <a href="#pricing" class="footer-link">Bảng giá</a>
+        </div>
+      </div>
+      <!-- Learn -->
+      <div>
+        <div class="footer-col-title">Học tập</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Từ vựng theo chủ đề</a>
+          <a href="#" class="footer-link">Ngữ pháp A1–C1</a>
+          <a href="#" class="footer-link">Luyện phát âm</a>
+          <a href="#" class="footer-link">Viết & AI chấm</a>
+          <a href="#" class="footer-link">Cộng đồng</a>
+        </div>
+      </div>
+      <!-- Support -->
+      <div>
+        <div class="footer-col-title">Hỗ trợ</div>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Trung tâm trợ giúp</a>
+          <a href="#" class="footer-link">Liên hệ</a>
+          <a href="#" class="footer-link">Blog học tiếng Anh</a>
+          <a href="#" class="footer-link">Điều khoản dịch vụ</a>
+          <a href="#" class="footer-link">Chính sách bảo mật</a>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom -->
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 EnglishMaster. Made with ❤️ for Vietnamese learners.</div>
+      <div class="footer-bottom-links">
+        <a href="#" class="footer-bottom-link">Privacy</a>
+        <a href="#" class="footer-bottom-link">Terms</a>
+        <a href="#" class="footer-bottom-link">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Navbar scroll */
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20)
+})
+
+/* Smooth scroll for nav links */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'))
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior:'smooth' }) }
+  })
+})
+
+/* Intersection Observer – fade-up on scroll */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible')
+      observer.unobserve(entry.target)
+    }
+  })
+}, { threshold: 0.12 })
+
+document.querySelectorAll('.anim-fade-up').forEach(el => observer.observe(el))
+</script>
+</body>
+</html>

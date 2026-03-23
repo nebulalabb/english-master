@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 
 // Add paths that require authentication
-const protectedPaths = ['/profile', '/settings', '/learn', '/practice', '/exam', '/community', '/shop'];
+const protectedPaths = ['/dashboard', '/profile', '/settings', '/learn', '/practice', '/exam', '/community', '/shop'];
 
 // Add paths that are only for guest users (login, register, etc.)
 const authPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email'];

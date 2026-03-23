@@ -32,6 +32,7 @@ export const useAuthStore = create<AuthState>()(
       token: typeof window !== 'undefined' ? Cookies.get('token') || null : null,
       setAuth: (user, token) => {
         Cookies.set('token', token, { expires: 7 });
+        localStorage.setItem('token', token);
         set({ user, token });
       },
       updateUser: (data) => {
@@ -41,6 +42,7 @@ export const useAuthStore = create<AuthState>()(
       },
       logout: () => {
         Cookies.remove('token');
+        localStorage.removeItem('token');
         set({ user: null, token: null });
       },
     }),

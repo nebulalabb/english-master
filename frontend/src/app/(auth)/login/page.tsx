@@ -172,14 +172,12 @@ export default function LoginPage() {
       const response = await api.post('/auth/login', data);
       const { user, accessToken } = response.data;
       
-      localStorage.setItem('token', accessToken);
-      Cookies.set('token', accessToken, { expires: 7 });
       setAuth(user, accessToken);
       
       toast.success('Đăng nhập thành công!');
       
       if (user.hasCompletedPlacementTest) {
-        router.push('/');
+        router.push('/dashboard');
       } else {
         router.push('/placement-test');
       }
